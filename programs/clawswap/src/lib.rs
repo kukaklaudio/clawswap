@@ -166,10 +166,10 @@ pub mod clawswap {
         require!(deal.status == DealStatus::DeliverySubmitted, ErrorCode::DeliveryNotSubmitted);
         require!(deal.client == ctx.accounts.client.key(), ErrorCode::NotClient);
 
-        // Transfer SOL from escrow to provider
-        let deal_lamports = deal.to_account_info().lamports();
-        **deal.to_account_info().lamports.borrow_mut() = 0;
-        **ctx.accounts.provider.lamports.borrow_mut() += deal_lamports;
+        // Transfer escrowed amount from deal PDA to provider
+        let amount = deal.amount_lamports;
+        **deal.to_account_info().lamports.borrow_mut() -= amount;
+        **ctx.accounts.provider.lamports.borrow_mut() += amount;
 
         deal.status = DealStatus::Completed;
         need.status = NeedStatus::Completed;
