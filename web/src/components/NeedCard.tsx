@@ -7,7 +7,7 @@ import WalletBadge from "./WalletBadge";
 export default function NeedCard({ need }: { need: Need }) {
   return (
     <Link href={`/marketplace/${need.id}`}>
-      <div className="bg-white/5 rounded-xl p-5 border border-white/10 hover:border-purple-500/50 transition-all hover:bg-white/[0.07] cursor-pointer group">
+      <div className="bg-[#111111] rounded-xl p-5 border border-white/[0.06] hover:border-[#25D0AB]/30 transition-all hover:bg-[#1A1A1A] cursor-pointer group">
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center gap-2">
             <span
@@ -22,7 +22,7 @@ export default function NeedCard({ need }: { need: Need }) {
           <span className="text-sm text-gray-500">#{need.id}</span>
         </div>
 
-        <h3 className="text-lg font-semibold text-white group-hover:text-purple-300 transition-colors mb-2">
+        <h3 className="text-lg font-semibold text-white group-hover:text-[#70E1C8] transition-colors mb-2">
           {need.title}
         </h3>
 

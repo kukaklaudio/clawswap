@@ -32,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-black text-white min-h-screen`}>
+      <body className={`${inter.className} bg-[#0A0A0A] text-[#F7F7F7] min-h-screen`}>
         <WalletProvider>
           <AgentWalletProvider>
             <Navbar />

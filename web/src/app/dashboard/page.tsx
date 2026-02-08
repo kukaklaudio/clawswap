@@ -56,10 +56,10 @@ export default function DashboardPage() {
 
   if (!wallet.publicKey) {
     return (
-      <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
+      <div className="text-center py-20 bg-[#111111] rounded-2xl border border-white/[0.06]">
         <span className="text-5xl mb-4 block">🔗</span>
-        <p className="text-gray-400 text-lg mb-2">Connect your wallet</p>
-        <p className="text-gray-500 text-sm">
+        <p className="text-[#7E7E7E] text-lg mb-2">Connect your wallet</p>
+        <p className="text-[#505050] text-sm">
           Connect a Solana wallet to see your dashboard
         </p>
       </div>
@@ -82,21 +82,21 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <p className="text-gray-400 font-mono text-sm mt-1">
+          <h1 className="text-3xl font-bold text-[#F7F7F7]">Dashboard</h1>
+          <p className="text-[#7E7E7E] font-mono text-sm mt-1">
             {shortenAddress(wallet.publicKey.toBase58(), 8)}
           </p>
         </div>
         <div className="flex gap-3">
           <Link
             href="/marketplace?action=create"
-            className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold text-sm"
+            className="px-5 py-2 bg-gradient-to-r from-[#25D0AB] to-[#70E1C8] rounded-lg font-semibold text-sm text-[#0A0A0A]"
           >
             + Post Need
           </Link>
           <button
             onClick={refresh}
-            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm hover:bg-white/10 transition-all"
+            className="px-4 py-2 bg-white/5 border border-white/[0.06] rounded-lg text-sm hover:bg-white/10 transition-all"
           >
             ↻ Refresh
           </button>
@@ -110,17 +110,17 @@ export default function DashboardPage() {
           value={`${(balance / LAMPORTS_PER_SOL).toFixed(2)} SOL`}
           color="text-white"
         />
-        <StatCard label="My Needs" value={myNeeds.length} color="text-blue-400" />
-        <StatCard label="My Offers" value={myOffers.length} color="text-purple-400" />
+        <StatCard label="My Needs" value={myNeeds.length} color="text-[#25D0AB]" />
+        <StatCard label="My Offers" value={myOffers.length} color="text-[#D864D8]" />
         <StatCard
           label="Active Deals"
           value={activeDeals.length}
-          color="text-yellow-400"
+          color="text-[#F5A623]"
         />
         <StatCard
           label="Earned"
           value={`${lamportsToSol(totalEarned)} SOL`}
-          color="text-green-400"
+          color="text-[#25D0AB]"
         />
       </div>
 
@@ -139,8 +139,8 @@ export default function DashboardPage() {
             onClick={() => setTab(t.key)}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
               tab === t.key
-                ? "bg-purple-600 text-white"
-                : "text-gray-400 hover:text-white"
+                ? "bg-[#25D0AB] text-[#0A0A0A]"
+                : "text-[#7E7E7E] hover:text-white"
             }`}
           >
             {t.label}
@@ -150,14 +150,13 @@ export default function DashboardPage() {
 
       {loading ? (
         <div className="flex justify-center py-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#25D0AB]" />
         </div>
       ) : (
         <>
           {/* Overview */}
           {tab === "overview" && (
             <div className="space-y-8">
-              {/* Active Deals - Priority */}
               {activeDeals.length > 0 && (
                 <Section title="⚡ Action Required" count={activeDeals.length}>
                   {activeDeals.map((deal) => (
@@ -170,7 +169,6 @@ export default function DashboardPage() {
                 </Section>
               )}
 
-              {/* Recent Needs */}
               {myNeeds.length > 0 && (
                 <Section title="📝 Your Recent Needs" count={myNeeds.length}>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -181,7 +179,6 @@ export default function DashboardPage() {
                 </Section>
               )}
 
-              {/* Recent Offers */}
               {myOffers.length > 0 && (
                 <Section title="🤝 Your Recent Offers" count={myOffers.length}>
                   {myOffers.slice(0, 5).map((offer) => (
@@ -190,28 +187,27 @@ export default function DashboardPage() {
                 </Section>
               )}
 
-              {/* Empty State */}
               {myNeeds.length === 0 &&
                 myOffers.length === 0 &&
                 myDeals.length === 0 && (
-                  <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10">
+                  <div className="text-center py-16 bg-[#111111] rounded-2xl border border-white/[0.06]">
                     <span className="text-5xl mb-4 block">🚀</span>
-                    <p className="text-gray-400 text-lg mb-2">
+                    <p className="text-[#7E7E7E] text-lg mb-2">
                       Welcome to ClawSwap!
                     </p>
-                    <p className="text-gray-500 text-sm mb-6">
+                    <p className="text-[#505050] text-sm mb-6">
                       Start by posting a need or browsing the marketplace
                     </p>
                     <div className="flex gap-3 justify-center">
                       <Link
                         href="/marketplace?action=create"
-                        className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold text-sm"
+                        className="px-6 py-2.5 bg-gradient-to-r from-[#25D0AB] to-[#70E1C8] rounded-lg font-semibold text-sm text-[#0A0A0A]"
                       >
                         Post a Need
                       </Link>
                       <Link
                         href="/marketplace"
-                        className="px-6 py-2.5 border border-white/20 rounded-lg font-semibold text-sm hover:bg-white/5"
+                        className="px-6 py-2.5 border border-white/[0.06] rounded-lg font-semibold text-sm hover:bg-white/5"
                       >
                         Browse Marketplace
                       </Link>
@@ -290,8 +286,6 @@ export default function DashboardPage() {
   );
 }
 
-// ── Sub-components ──
-
 function StatCard({
   label,
   value,
@@ -302,8 +296,8 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-      <p className="text-xs text-gray-500 uppercase tracking-wider">{label}</p>
+    <div className="bg-[#111111] rounded-xl p-4 border border-white/[0.06]">
+      <p className="text-xs text-[#505050] uppercase tracking-wider">{label}</p>
       <p className={`text-xl font-bold mt-1 ${color}`}>{value}</p>
     </div>
   );
@@ -320,7 +314,7 @@ function Section({
 }) {
   return (
     <div>
-      <h3 className="text-lg font-semibold text-white mb-3">{title}</h3>
+      <h3 className="text-lg font-semibold text-[#F7F7F7] mb-3">{title}</h3>
       {children}
     </div>
   );
@@ -329,7 +323,7 @@ function Section({
 function OfferRow({ offer }: { offer: Offer }) {
   return (
     <Link href={`/marketplace/${offer.needId}`}>
-      <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/[0.07] transition-all cursor-pointer">
+      <div className="bg-[#111111] rounded-xl p-4 border border-white/[0.06] hover:bg-[#1A1A1A] transition-all cursor-pointer">
         <div className="flex justify-between items-center">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -340,16 +334,16 @@ function OfferRow({ offer }: { offer: Offer }) {
               >
                 {offer.status}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-[#505050]">
                 Need #{offer.needId} • Offer #{offer.id}
               </span>
             </div>
             <p className="text-white text-sm">{offer.message}</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-[#505050] mt-1">
               {formatDate(offer.createdAt)}
             </p>
           </div>
-          <p className="text-lg font-bold text-green-400 ml-4">
+          <p className="text-lg font-bold text-[#25D0AB] ml-4">
             {lamportsToSol(offer.priceLamports)} SOL
           </p>
         </div>
@@ -371,7 +365,7 @@ function DealRow({ deal, myPk }: { deal: Deal; myPk: string }) {
 
   return (
     <Link href={`/marketplace/${deal.needId}`}>
-      <div className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/[0.07] transition-all cursor-pointer">
+      <div className="bg-[#111111] rounded-xl p-4 border border-white/[0.06] hover:bg-[#1A1A1A] transition-all cursor-pointer">
         <div className="flex justify-between items-center">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -382,29 +376,29 @@ function DealRow({ deal, myPk }: { deal: Deal; myPk: string }) {
               >
                 {deal.status}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-[#505050]">
                 Deal #{deal.id} • Need #{deal.needId}
               </span>
               <span
                 className={`text-xs px-2 py-0.5 rounded ${
-                  isProvider ? "bg-purple-500/20 text-purple-400" : "bg-blue-500/20 text-blue-400"
+                  isProvider ? "bg-[#25D0AB]/20 text-[#25D0AB]" : "bg-blue-500/20 text-blue-400"
                 }`}
               >
                 {role}
               </span>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-400">
+            <div className="flex items-center gap-4 text-sm text-[#7E7E7E]">
               <span>
                 {shortenAddress(deal.client)} → {shortenAddress(deal.provider)}
               </span>
             </div>
             {actionLabel && (
-              <p className="text-xs text-yellow-400 mt-1 font-medium">
+              <p className="text-xs text-[#F5A623] mt-1 font-medium">
                 {actionLabel}
               </p>
             )}
           </div>
-          <p className="text-lg font-bold text-green-400 ml-4">
+          <p className="text-lg font-bold text-[#25D0AB] ml-4">
             {lamportsToSol(deal.amountLamports)} SOL
           </p>
         </div>
@@ -425,12 +419,12 @@ function EmptyState({
   href: string;
 }) {
   return (
-    <div className="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
+    <div className="text-center py-12 bg-[#111111] rounded-2xl border border-white/[0.06]">
       <span className="text-4xl mb-3 block">{emoji}</span>
-      <p className="text-gray-400 mb-4">{text}</p>
+      <p className="text-[#7E7E7E] mb-4">{text}</p>
       <Link
         href={href}
-        className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold text-sm inline-block"
+        className="px-6 py-2.5 bg-gradient-to-r from-[#25D0AB] to-[#70E1C8] rounded-lg font-semibold text-sm inline-block text-[#0A0A0A]"
       >
         {action}
       </Link>

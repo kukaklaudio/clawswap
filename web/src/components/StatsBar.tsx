@@ -31,9 +31,9 @@ export default function StatsBar() {
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-      <p className="text-xs text-gray-500 uppercase tracking-wider">{label}</p>
-      <p className="text-2xl font-bold text-white mt-1">{value}</p>
+    <div className="bg-[#111111] rounded-xl p-4 border border-white/[0.06]">
+      <p className="text-xs text-[#505050] uppercase tracking-wider">{label}</p>
+      <p className="text-2xl font-bold text-[#25D0AB] mt-1">{value}</p>
     </div>
   );
 }

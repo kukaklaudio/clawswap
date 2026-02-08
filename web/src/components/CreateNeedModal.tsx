@@ -91,18 +91,18 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="bg-gray-900 rounded-2xl w-full max-w-lg border border-white/10 overflow-hidden">
+      <div className="bg-[#111111] rounded-2xl w-full max-w-lg border border-white/[0.06] overflow-hidden">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-white/10">
+        <div className="flex justify-between items-center p-6 border-b border-white/[0.06]">
           <div>
-            <h2 className="text-xl font-bold text-white">Post a Need</h2>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <h2 className="text-xl font-bold text-[#F7F7F7]">Post a Need</h2>
+            <p className="text-sm text-[#505050] mt-0.5">
               Step {step} of 2 — {step === 1 ? "What do you need?" : "Details & Budget"}
             </p>
           </div>
           <button
             onClick={() => { onClose(); setStep(1); }}
-            className="text-gray-400 hover:text-white text-xl"
+            className="text-[#7E7E7E] hover:text-white text-xl"
           >
             ✕
           </button>
@@ -111,9 +111,8 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
         <form onSubmit={handleSubmit} className="p-6">
           {step === 1 && (
             <div className="space-y-4">
-              {/* Category Selection */}
               <div>
-                <label className="text-sm text-gray-400 block mb-2">
+                <label className="text-sm text-[#7E7E7E] block mb-2">
                   Category
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -124,14 +123,14 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
                       onClick={() => setForm({ ...form, category: cat.value })}
                       className={`text-left p-3 rounded-lg border transition-all ${
                         form.category === cat.value
-                          ? "border-purple-500 bg-purple-500/10"
-                          : "border-white/10 bg-white/5 hover:bg-white/[0.07]"
+                          ? "border-[#25D0AB] bg-[#25D0AB]/10"
+                          : "border-white/[0.06] bg-white/5 hover:bg-white/[0.07]"
                       }`}
                     >
                       <p className="text-sm font-medium text-white">
                         {cat.label}
                       </p>
-                      <p className="text-xs text-gray-500">{cat.desc}</p>
+                      <p className="text-xs text-[#505050]">{cat.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -140,7 +139,7 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:from-purple-500 hover:to-pink-500 transition-all"
+                className="w-full py-3 bg-gradient-to-r from-[#25D0AB] to-[#70E1C8] rounded-lg font-semibold hover:brightness-110 transition-all text-[#0A0A0A]"
               >
                 Next →
               </button>
@@ -150,7 +149,7 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-gray-400 block mb-1">
+                <label className="text-sm text-[#7E7E7E] block mb-1">
                   Title
                 </label>
                 <input
@@ -158,17 +157,17 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none"
+                  className="w-full bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-4 py-2.5 text-white focus:border-[#25D0AB] focus:outline-none"
                   placeholder="e.g., Analyze sentiment of 500 Solana tweets"
                   maxLength={64}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#505050] mt-1">
                   {form.title.length}/64 characters
                 </p>
               </div>
 
               <div>
-                <label className="text-sm text-gray-400 block mb-1">
+                <label className="text-sm text-[#7E7E7E] block mb-1">
                   Description
                 </label>
                 <textarea
@@ -178,17 +177,17 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
                   onChange={(e) =>
                     setForm({ ...form, description: e.target.value })
                   }
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none resize-none"
+                  className="w-full bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-4 py-2.5 text-white focus:border-[#25D0AB] focus:outline-none resize-none"
                   placeholder="Describe exactly what you need, expected output format, and any requirements..."
                   maxLength={256}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[#505050] mt-1">
                   {form.description.length}/256 characters
                 </p>
               </div>
 
               <div>
-                <label className="text-sm text-gray-400 block mb-1">
+                <label className="text-sm text-[#7E7E7E] block mb-1">
                   Budget (SOL)
                 </label>
                 <div className="flex gap-2">
@@ -199,8 +198,8 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
                       onClick={() => setForm({ ...form, budget: amount })}
                       className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
                         form.budget === amount
-                          ? "bg-green-600 text-white"
-                          : "bg-white/5 text-gray-400 hover:bg-white/10"
+                          ? "bg-[#25D0AB] text-[#0A0A0A]"
+                          : "bg-white/5 text-[#7E7E7E] hover:bg-white/10"
                       }`}
                     >
                       {amount}
@@ -215,24 +214,24 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
                     onChange={(e) =>
                       setForm({ ...form, budget: e.target.value })
                     }
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="flex-1 bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-3 py-1.5 text-white text-sm focus:border-[#25D0AB] focus:outline-none"
                     placeholder="Custom"
                   />
                 </div>
               </div>
 
               {/* Summary */}
-              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <p className="text-xs text-gray-500 mb-2">Summary</p>
+              <div className="bg-[#0A0A0A] rounded-lg p-4 border border-white/[0.06]">
+                <p className="text-xs text-[#505050] mb-2">Summary</p>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Category</span>
+                  <span className="text-[#7E7E7E]">Category</span>
                   <span className="text-white">
                     {CATEGORIES.find((c) => c.value === form.category)?.label}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm mt-1">
-                  <span className="text-gray-400">Budget</span>
-                  <span className="text-green-400 font-semibold">
+                  <span className="text-[#7E7E7E]">Budget</span>
+                  <span className="text-[#25D0AB] font-semibold">
                     {form.budget} SOL
                   </span>
                 </div>
@@ -242,14 +241,14 @@ export default function CreateNeedModal({ isOpen, onClose, onSuccess }: Props) {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg font-semibold hover:bg-white/10 transition-all"
+                  className="px-6 py-3 bg-white/5 border border-white/[0.06] rounded-lg font-semibold hover:bg-white/10 transition-all"
                 >
                   ← Back
                 </button>
                 <button
                   type="submit"
                   disabled={loading || !wallet.publicKey}
-                  className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:from-purple-500 hover:to-pink-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-3 bg-gradient-to-r from-[#25D0AB] to-[#70E1C8] rounded-lg font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0A0A]"
                 >
                   {loading
                     ? "Creating..."

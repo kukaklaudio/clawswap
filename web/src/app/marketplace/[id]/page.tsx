@@ -91,8 +91,6 @@ export default function NeedDetailPage() {
       PROGRAM_ID
     )[0];
 
-  // ── Actions ──
-
   const handleMakeOffer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!wallet.publicKey) return;
@@ -212,12 +210,10 @@ export default function NeedDetailPage() {
     }
   };
 
-  // ── Render ──
-
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#25D0AB]" />
       </div>
     );
   }
@@ -226,8 +222,8 @@ export default function NeedDetailPage() {
     return (
       <div className="text-center py-20">
         <span className="text-4xl mb-4 block">❌</span>
-        <p className="text-gray-400 mb-4">Need not found</p>
-        <Link href="/marketplace" className="text-purple-400 hover:underline">
+        <p className="text-[#7E7E7E] mb-4">Need not found</p>
+        <Link href="/marketplace" className="text-[#25D0AB] hover:underline">
           ← Back to Marketplace
         </Link>
       </div>
@@ -239,16 +235,15 @@ export default function NeedDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Breadcrumb */}
       <Link
         href="/marketplace"
-        className="text-sm text-gray-500 hover:text-gray-300 mb-4 inline-block"
+        className="text-sm text-[#505050] hover:text-[#7E7E7E] mb-4 inline-block"
       >
         ← Back to Marketplace
       </Link>
 
       {/* Need Header */}
-      <div className="bg-white/5 rounded-2xl p-6 border border-white/10 mb-6">
+      <div className="bg-[#111111] rounded-2xl p-6 border border-white/[0.06] mb-6">
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-3">
             <span
@@ -258,17 +253,17 @@ export default function NeedDetailPage() {
             >
               {need.status}
             </span>
-            <span className="text-xs px-2 py-1 rounded bg-white/10 text-gray-300">
+            <span className="text-xs px-2 py-1 rounded bg-white/[0.06] text-[#7E7E7E]">
               {need.category}
             </span>
           </div>
-          <span className="text-gray-500 text-sm">Need #{need.id}</span>
+          <span className="text-[#505050] text-sm">Need #{need.id}</span>
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-3">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#F7F7F7] mb-3">
           {need.title}
         </h1>
-        <p className="text-gray-400 leading-relaxed mb-6">{need.description}</p>
+        <p className="text-[#7E7E7E] leading-relaxed mb-6">{need.description}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <InfoBlock label="Budget" value={`${lamportsToSol(need.budgetLamports)} SOL`} highlight />
@@ -286,7 +281,7 @@ export default function NeedDetailPage() {
         <div className="mb-6">
           <button
             onClick={() => setShowOfferForm(!showOfferForm)}
-            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-semibold hover:from-purple-500 hover:to-pink-500 transition-all"
+            className="w-full py-3 bg-gradient-to-r from-[#25D0AB] to-[#70E1C8] rounded-xl font-semibold hover:brightness-110 transition-all text-[#0A0A0A]"
           >
             {showOfferForm ? "Cancel" : "🤝 Make an Offer"}
           </button>
@@ -297,14 +292,14 @@ export default function NeedDetailPage() {
       {showOfferForm && (
         <form
           onSubmit={handleMakeOffer}
-          className="bg-purple-500/10 rounded-2xl p-6 border border-purple-500/30 mb-6"
+          className="bg-[#25D0AB]/10 rounded-2xl p-6 border border-[#25D0AB]/30 mb-6"
         >
-          <h3 className="text-lg font-semibold text-white mb-4">
+          <h3 className="text-lg font-semibold text-[#F7F7F7] mb-4">
             Submit Your Offer
           </h3>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="text-sm text-gray-400 block mb-1">
+              <label className="text-sm text-[#7E7E7E] block mb-1">
                 Your Price (SOL)
               </label>
               <input
@@ -317,18 +312,18 @@ export default function NeedDetailPage() {
                   setOfferForm({ ...offerForm, price: e.target.value })
                 }
                 placeholder={`Budget: ${lamportsToSol(need.budgetLamports)} SOL`}
-                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none"
+                className="w-full bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-4 py-2.5 text-white focus:border-[#25D0AB] focus:outline-none"
               />
             </div>
             <div className="flex items-end">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[#505050]">
                 Tip: Offering below budget ({lamportsToSol(need.budgetLamports)} SOL)
                 increases your chances of being accepted.
               </p>
             </div>
           </div>
           <div className="mb-4">
-            <label className="text-sm text-gray-400 block mb-1">
+            <label className="text-sm text-[#7E7E7E] block mb-1">
               Why should they pick you?
             </label>
             <textarea
@@ -338,14 +333,14 @@ export default function NeedDetailPage() {
               onChange={(e) =>
                 setOfferForm({ ...offerForm, message: e.target.value })
               }
-              className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-purple-500 focus:outline-none resize-none"
+              className="w-full bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-4 py-2.5 text-white focus:border-[#25D0AB] focus:outline-none resize-none"
               placeholder="Describe your capabilities, experience, and estimated delivery time..."
             />
           </div>
           <button
             type="submit"
             disabled={submitting}
-            className="px-8 py-2.5 bg-purple-600 rounded-lg font-semibold hover:bg-purple-500 disabled:opacity-50 transition-all"
+            className="px-8 py-2.5 bg-[#25D0AB] rounded-lg font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-[#0A0A0A]"
           >
             {submitting && activeAction === "offer"
               ? "Submitting..."
@@ -356,19 +351,19 @@ export default function NeedDetailPage() {
 
       {/* Offers Section */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-semibold text-[#F7F7F7] mb-4 flex items-center gap-2">
           <span>🤝</span> Offers
-          <span className="text-sm font-normal text-gray-500">
+          <span className="text-sm font-normal text-[#505050]">
             ({offers.length})
           </span>
         </h2>
 
         {offers.length === 0 ? (
-          <div className="bg-white/5 rounded-xl p-8 border border-white/10 text-center">
+          <div className="bg-[#111111] rounded-xl p-8 border border-white/[0.06] text-center">
             <span className="text-3xl mb-2 block">💬</span>
-            <p className="text-gray-400">No offers yet.</p>
+            <p className="text-[#7E7E7E]">No offers yet.</p>
             {need.status === "open" && (
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-[#505050] text-sm mt-1">
                 Be the first to make an offer!
               </p>
             )}
@@ -378,7 +373,7 @@ export default function NeedDetailPage() {
             {offers.map((offer) => (
               <div
                 key={offer.id}
-                className="bg-white/5 rounded-xl p-5 border border-white/10 hover:bg-white/[0.07] transition-all"
+                className="bg-[#111111] rounded-xl p-5 border border-white/[0.06] hover:bg-[#1A1A1A] transition-all"
               >
                 <div className="flex flex-col md:flex-row justify-between gap-4">
                   <div className="flex-1">
@@ -390,12 +385,12 @@ export default function NeedDetailPage() {
                       >
                         {offer.status}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[#505050]">
                         Offer #{offer.id}
                       </span>
                     </div>
                     <p className="text-white">{offer.message}</p>
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs text-[#505050] mt-2">
                       by{" "}
                       <span className="font-mono">
                         {shortenAddress(offer.provider, 6)}
@@ -404,7 +399,7 @@ export default function NeedDetailPage() {
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <p className="text-xl font-bold text-green-400">
+                    <p className="text-xl font-bold text-[#25D0AB]">
                       {lamportsToSol(offer.priceLamports)} SOL
                     </p>
                     {need.status === "open" &&
@@ -413,7 +408,7 @@ export default function NeedDetailPage() {
                         <button
                           onClick={() => handleAcceptOffer(offer)}
                           disabled={submitting}
-                          className="px-5 py-2 bg-green-600 rounded-lg text-sm font-semibold hover:bg-green-500 disabled:opacity-50 transition-all"
+                          className="px-5 py-2 bg-[#25D0AB] rounded-lg text-sm font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-[#0A0A0A]"
                         >
                           {submitting && activeAction === `accept-${offer.id}`
                             ? "Accepting..."
@@ -431,9 +426,9 @@ export default function NeedDetailPage() {
       {/* Deals Section */}
       {deals.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-[#F7F7F7] mb-4 flex items-center gap-2">
             <span>📋</span> Active Deals
-            <span className="text-sm font-normal text-gray-500">
+            <span className="text-sm font-normal text-[#505050]">
               ({deals.length})
             </span>
           </h2>
@@ -446,7 +441,7 @@ export default function NeedDetailPage() {
               return (
                 <div
                   key={deal.id}
-                  className="bg-white/5 rounded-xl p-5 border border-white/10"
+                  className="bg-[#111111] rounded-xl p-5 border border-white/[0.06]"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-2">
@@ -457,18 +452,18 @@ export default function NeedDetailPage() {
                       >
                         {deal.status}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[#505050]">
                         Deal #{deal.id}
                       </span>
                     </div>
-                    <p className="text-xl font-bold text-green-400">
+                    <p className="text-xl font-bold text-[#25D0AB]">
                       {lamportsToSol(deal.amountLamports)} SOL
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                     <div>
-                      <span className="text-gray-500">Client:</span>{" "}
+                      <span className="text-[#505050]">Client:</span>{" "}
                       <span className="font-mono text-white text-xs">
                         {shortenAddress(deal.client, 6)}
                       </span>
@@ -477,12 +472,12 @@ export default function NeedDetailPage() {
                       )}
                     </div>
                     <div>
-                      <span className="text-gray-500">Provider:</span>{" "}
+                      <span className="text-[#505050]">Provider:</span>{" "}
                       <span className="font-mono text-white text-xs">
                         {shortenAddress(deal.provider, 6)}
                       </span>
                       {isProvider && (
-                        <span className="text-xs text-purple-400 ml-1">
+                        <span className="text-xs text-[#25D0AB] ml-1">
                           (you)
                         </span>
                       )}
@@ -490,8 +485,8 @@ export default function NeedDetailPage() {
                   </div>
 
                   {deal.deliveryHash && (
-                    <div className="bg-black/30 rounded-lg p-3 mb-4">
-                      <p className="text-xs text-gray-500 mb-1">
+                    <div className="bg-[#0A0A0A] rounded-lg p-3 mb-4">
+                      <p className="text-xs text-[#505050] mb-1">
                         📦 Delivery Hash
                       </p>
                       <p className="text-sm text-white font-mono break-all">
@@ -502,8 +497,8 @@ export default function NeedDetailPage() {
 
                   {/* Provider: Submit Delivery */}
                   {deal.status === "inProgress" && isProvider && (
-                    <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20">
-                      <p className="text-sm text-gray-300 mb-3">
+                    <div className="bg-[#25D0AB]/10 rounded-lg p-4 border border-[#25D0AB]/20">
+                      <p className="text-sm text-[#7E7E7E] mb-3">
                         📦 Ready to deliver? Submit your work hash (IPFS, URL,
                         or identifier):
                       </p>
@@ -513,12 +508,12 @@ export default function NeedDetailPage() {
                           value={deliveryHash}
                           onChange={(e) => setDeliveryHash(e.target.value)}
                           placeholder="QmX7bF3jK9mN2pL4qR8s... or https://..."
-                          className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
+                          className="flex-1 bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-3 py-2 text-white text-sm focus:border-[#25D0AB] focus:outline-none"
                         />
                         <button
                           onClick={() => handleSubmitDelivery(deal)}
                           disabled={submitting || !deliveryHash}
-                          className="px-5 py-2 bg-purple-600 rounded-lg text-sm font-semibold hover:bg-purple-500 disabled:opacity-50 transition-all"
+                          className="px-5 py-2 bg-[#25D0AB] rounded-lg text-sm font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-[#0A0A0A]"
                         >
                           {submitting &&
                           activeAction === `deliver-${deal.id}`
@@ -531,15 +526,15 @@ export default function NeedDetailPage() {
 
                   {/* Client: Confirm Delivery */}
                   {deal.status === "deliverySubmitted" && isClient && (
-                    <div className="bg-green-500/10 rounded-lg p-4 border border-green-500/20">
-                      <p className="text-sm text-gray-300 mb-3">
+                    <div className="bg-[#25D0AB]/10 rounded-lg p-4 border border-[#25D0AB]/20">
+                      <p className="text-sm text-[#7E7E7E] mb-3">
                         ✅ Delivery received! Review the work and confirm to
                         release payment:
                       </p>
                       <button
                         onClick={() => handleConfirmDelivery(deal)}
                         disabled={submitting}
-                        className="px-6 py-2.5 bg-green-600 rounded-lg font-semibold hover:bg-green-500 disabled:opacity-50 transition-all"
+                        className="px-6 py-2.5 bg-[#25D0AB] rounded-lg font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-[#0A0A0A]"
                       >
                         {submitting &&
                         activeAction === `confirm-${deal.id}`
@@ -551,9 +546,9 @@ export default function NeedDetailPage() {
 
                   {/* Completed */}
                   {deal.status === "completed" && (
-                    <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20 text-center">
+                    <div className="bg-[#25D0AB]/10 rounded-lg p-4 border border-[#25D0AB]/20 text-center">
                       <span className="text-2xl">🎉</span>
-                      <p className="text-sm text-blue-300 mt-1">
+                      <p className="text-sm text-[#25D0AB] mt-1">
                         Deal completed! {lamportsToSol(deal.amountLamports)} SOL
                         transferred to provider.
                       </p>
@@ -581,11 +576,11 @@ function InfoBlock({
   mono?: boolean;
 }) {
   return (
-    <div className="bg-black/20 rounded-lg p-3">
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
+    <div className="bg-[#0A0A0A] rounded-lg p-3">
+      <p className="text-xs text-[#505050] mb-1">{label}</p>
       <p
         className={`text-sm font-semibold ${
-          highlight ? "text-green-400" : "text-white"
+          highlight ? "text-[#25D0AB]" : "text-white"
         } ${mono ? "font-mono text-xs" : ""}`}
       >
         {value}
