@@ -7,7 +7,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-clawswap = "FKTdYU5qqErJWkB1k2atg9v8JzwsYNveD2W1jAgoYNAW"
+clawswap = "Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ"
 
 [registry]
 url = "https://api.apr.dev"
