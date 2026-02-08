@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
 declare_id!("FKTdYU5qqErJWkB1k2atg9v8JzwsYNveD2W1jAgoYNAW");
 
@@ -7,7 +6,7 @@ declare_id!("FKTdYU5qqErJWkB1k2atg9v8JzwsYNveD2W1jAgoYNAW");
 pub mod clawswap {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>, global_id: u64) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>, _global_id: u64) -> Result<()> {
         let global = &mut ctx.accounts.global;
         global.authority = ctx.accounts.authority.key();
         global.need_counter = 0;
@@ -85,16 +84,13 @@ pub mod clawswap {
     }
 
     pub fn accept_offer(ctx: Context<AcceptOffer>) -> Result<()> {
-        let global = &mut ctx.accounts.global;
-        let need = &mut ctx.accounts.need;
-        let offer = &mut ctx.accounts.offer;
-        let deal = &mut ctx.accounts.deal;
+        require!(ctx.accounts.need.status == NeedStatus::Open, ErrorCode::NeedNotOpen);
+        require!(ctx.accounts.offer.status == OfferStatus::Pending, ErrorCode::OfferNotPending);
+        require!(ctx.accounts.need.creator == ctx.accounts.client.key(), ErrorCode::NotNeedCreator);
 
-        require!(need.status == NeedStatus::Open, ErrorCode::NeedNotOpen);
-        require!(offer.status == OfferStatus::Pending, ErrorCode::OfferNotPending);
-        require!(need.creator == ctx.accounts.client.key(), ErrorCode::NotNeedCreator);
+        let price = ctx.accounts.offer.price_lamports;
 
-        // Transfer SOL to escrow (deal PDA)
+        // Transfer SOL to escrow (deal PDA) — before mutable borrows
         let transfer_ix = anchor_lang::system_program::Transfer {
             from: ctx.accounts.client.to_account_info(),
             to: ctx.accounts.deal.to_account_info(),
@@ -104,8 +100,14 @@ pub mod clawswap {
                 ctx.accounts.system_program.to_account_info(),
                 transfer_ix,
             ),
-            offer.price_lamports,
+            price,
         )?;
+
+        // Now take mutable borrows
+        let global = &mut ctx.accounts.global;
+        let need = &mut ctx.accounts.need;
+        let offer = &mut ctx.accounts.offer;
+        let deal = &mut ctx.accounts.deal;
 
         // Update states
         need.status = NeedStatus::InProgress;
@@ -116,7 +118,7 @@ pub mod clawswap {
         deal.offer_id = offer.id;
         deal.client = ctx.accounts.client.key();
         deal.provider = offer.provider;
-        deal.amount_lamports = offer.price_lamports;
+        deal.amount_lamports = price;
         deal.status = DealStatus::InProgress;
         deal.created_at = Clock::get()?.unix_timestamp;
         deal.delivery_hash = None;
