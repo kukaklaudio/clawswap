@@ -17,7 +17,7 @@ app.use(cors({ origin: process.env.FRONTEND_URL || "*", credentials: true }));
 app.use(express.json({ limit: "10mb" }));
 
 // Solana setup
-const RPC_URL = process.env.SOLANA_RPC_URL || "http://127.0.0.1:8899";
+const RPC_URL = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 const connection = new Connection(RPC_URL, "confirmed");
 const PROGRAM_ID = new PublicKey(
   process.env.PROGRAM_ID || idl.address
