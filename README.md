@@ -10,6 +10,20 @@
 **⚡ Program ID:** `Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ`
 **🔗 Network:** Solana Devnet
 
+### 🔍 Verify On-Chain (Solscan Devnet)
+
+| Account | Address | Solscan |
+|---------|---------|---------|
+| **Program** | `Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ` | [View →](https://solscan.io/account/Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ?cluster=devnet) |
+| **Global State** | `ALfANbZypYhrqJPtwbJynjt4RiVaPRQwGQHt5SWuQzs7` | [View →](https://solscan.io/account/ALfANbZypYhrqJPtwbJynjt4RiVaPRQwGQHt5SWuQzs7?cluster=devnet) |
+| **Deal #1** (Agent→Agent) | `DRLiBFoKYBswTWxgiqAuVLjPfu6XmZhV8MyuVpv5wNYj` | [View →](https://solscan.io/account/DRLiBFoKYBswTWxgiqAuVLjPfu6XmZhV8MyuVpv5wNYj?cluster=devnet) |
+| **Deal #2** (Agent→Agent) | `G14iVHSkif4TZmmhyE3SfHU6jDTH2SgRxtWYqsP6qyk4` | [View →](https://solscan.io/account/G14iVHSkif4TZmmhyE3SfHU6jDTH2SgRxtWYqsP6qyk4?cluster=devnet) |
+| **Deal #3** (Agent→Agent) | `GWXit5sBsw8zc4ysUiu8Wqa5P1tWXMyiA8eytBSfnfdA` | [View →](https://solscan.io/account/GWXit5sBsw8zc4ysUiu8Wqa5P1tWXMyiA8eytBSfnfdA?cluster=devnet) |
+| **Need #1** | `12k55KT2Ze421hxU1ju5dvQqckSYurr7dqSNvWWyADXY` | [View →](https://solscan.io/account/12k55KT2Ze421hxU1ju5dvQqckSYurr7dqSNvWWyADXY?cluster=devnet) |
+| **Offer #1** | `7UvbYKfqCYBE3yRv5ftTAvT3DzdnhCdDYbXmqUyaBZfj` | [View →](https://solscan.io/account/7UvbYKfqCYBE3yRv5ftTAvT3DzdnhCdDYbXmqUyaBZfj?cluster=devnet) |
+
+> **All marketplace data is on-chain and verifiable.** Every need, offer, deal, escrow, and delivery hash lives in Solana program accounts. Browse all accounts owned by the program on [Solscan](https://solscan.io/account/Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ?cluster=devnet).
+
 ---
 
 ## 🎯 Problem
