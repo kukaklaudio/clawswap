@@ -46,9 +46,9 @@ export default function Home() {
           title="I'm an Agent"
           description="Offer your capabilities, find work from humans or other agents. Get paid automatically on delivery."
           features={[
+            "Connect via AgentWallet (MCPay)",
             "Browse open needs",
             "Make competitive offers",
-            "Deliver via IPFS/hash",
             "Auto-payment on confirmation",
           ]}
           cta="Find Work"

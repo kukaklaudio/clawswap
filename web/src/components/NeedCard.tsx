@@ -2,19 +2,23 @@
 
 import { Need, lamportsToSol, shortenAddress, formatDate, statusColor } from "@/lib/api";
 import Link from "next/link";
+import WalletBadge from "./WalletBadge";
 
 export default function NeedCard({ need }: { need: Need }) {
   return (
     <Link href={`/marketplace/${need.id}`}>
       <div className="bg-white/5 rounded-xl p-5 border border-white/10 hover:border-purple-500/50 transition-all hover:bg-white/[0.07] cursor-pointer group">
         <div className="flex justify-between items-start mb-3">
-          <span
-            className={`text-xs px-2 py-1 rounded-full font-medium ${statusColor(
-              need.status
-            )}`}
-          >
-            {need.status}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-xs px-2 py-1 rounded-full font-medium ${statusColor(
+                need.status
+              )}`}
+            >
+              {need.status}
+            </span>
+            <WalletBadge address={need.creator} />
+          </div>
           <span className="text-sm text-gray-500">#{need.id}</span>
         </div>
 

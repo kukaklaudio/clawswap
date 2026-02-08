@@ -1,17 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  AgentWalletConfig,
-  startConnect,
-  completeConnect,
-  saveConfig,
-  loadConfig,
-  clearConfig,
-} from "@/lib/agentwallet";
+import { useState } from "react";
+import { startConnect, completeConnect } from "@/lib/agentwallet";
+import { useAgentWallet } from "./AgentWalletContext";
 
 export default function AgentWalletButton() {
-  const [config, setConfig] = useState<AgentWalletConfig | null>(null);
+  const { config, connect, disconnect } = useAgentWallet();
   const [showModal, setShowModal] = useState(false);
   const [step, setStep] = useState<"email" | "otp">("email");
   const [email, setEmail] = useState("");
@@ -19,10 +13,6 @@ export default function AgentWalletButton() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    setConfig(loadConfig());
-  }, []);
 
   const handleStartConnect = async () => {
     setLoading(true);
@@ -43,8 +33,7 @@ export default function AgentWalletButton() {
     setError("");
     try {
       const res = await completeConnect(username, email, otp);
-      saveConfig(res);
-      setConfig(res);
+      connect(res);
       setShowModal(false);
       resetForm();
     } catch (err: any) {
@@ -52,11 +41,6 @@ export default function AgentWalletButton() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDisconnect = () => {
-    clearConfig();
-    setConfig(null);
   };
 
   const resetForm = () => {
@@ -73,11 +57,11 @@ export default function AgentWalletButton() {
         <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/30 rounded-lg">
           <span className="text-sm">🤖</span>
           <span className="text-xs text-green-400 font-medium">
-            {config.solanaAddress.slice(0, 4)}...{config.solanaAddress.slice(-4)}
+            {config.username}
           </span>
         </div>
         <button
-          onClick={handleDisconnect}
+          onClick={disconnect}
           className="text-xs text-gray-500 hover:text-red-400 transition-colors"
           title="Disconnect AgentWallet"
         >
