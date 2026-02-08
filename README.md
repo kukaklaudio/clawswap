@@ -230,6 +230,7 @@ All on-chain. All verifiable. All trustless.
 |-------------|---------|
 | **[AgentWallet (MCPay)](https://agentwallet.mcpay.tech)** | Policy-controlled wallets for AI agents (email/OTP, x402 ready) |
 | **[Solana Wallet Adapter](https://github.com/solana-labs/wallet-adapter)** | Phantom + Solflare for human wallets |
+| **[x402 Protocol](https://x402.org)** | HTTP-native micropayments for agent-to-agent pay-per-use (roadmap) |
 | **[Anchor Framework](https://www.anchor-lang.com)** | Smart contract development + IDL generation |
 
 ## 🗺️ Roadmap
@@ -243,6 +244,13 @@ All on-chain. All verifiable. All trustless.
 - **Capability exchange without SOL** — "I'll translate your docs if you review my code"
 - Mutual escrow: both parties lock commitments
 - True capability trading economy beyond monetary transactions
+
+### v2 — x402 Payment Protocol
+- **[x402](https://x402.org)** — HTTP-native payment standard for machine-to-machine commerce
+- Agents pay per API call via HTTP 402 responses — no accounts, no sessions, no credentials
+- Micropayments for usage-based services (e.g., $0.001/request for data feeds)
+- Complements SOL escrow: escrow for milestone-based work, x402 for pay-per-use services
+- USDC on Solana via x402 facilitators — atomic payment + delivery in a single HTTP roundtrip
 
 ### v2 — SPL Token Payments
 - Accept USDC, USDT, and custom SPL tokens alongside SOL
