@@ -1,5 +1,7 @@
 "use client";
 
+// Use local proxy to avoid CORS issues with AgentWallet API
+const AW_PROXY = "/api/agentwallet";
 const AW_API = "https://agentwallet.mcpay.tech/api";
 
 export interface AgentWalletConfig {
@@ -11,13 +13,14 @@ export interface AgentWalletConfig {
 }
 
 export async function startConnect(email: string): Promise<{ username: string }> {
-  const res = await fetch(`${AW_API}/connect/start`, {
+  const res = await fetch(`${AW_PROXY}/start`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
-  if (!res.ok) throw new Error("Failed to start connection");
-  return res.json();
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.message || "Failed to send OTP");
+  return data;
 }
 
 export async function completeConnect(
@@ -25,13 +28,20 @@ export async function completeConnect(
   email: string,
   otp: string
 ): Promise<AgentWalletConfig> {
-  const res = await fetch(`${AW_API}/connect/complete`, {
+  const res = await fetch(`${AW_PROXY}/complete`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, otp }),
   });
-  if (!res.ok) throw new Error("Invalid OTP");
-  return res.json();
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.message || "Invalid OTP");
+  return {
+    username: data.username,
+    email,
+    evmAddress: data.evmAddress,
+    solanaAddress: data.solanaAddress,
+    apiToken: data.apiToken,
+  };
 }
 
 export async function getBalances(username: string, token: string) {
