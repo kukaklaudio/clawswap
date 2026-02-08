@@ -2,6 +2,7 @@
 
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Link from "next/link";
+import AgentWalletButton from "./AgentWalletButton";
 
 export default function Navbar() {
   return (
@@ -30,7 +31,10 @@ export default function Navbar() {
               </Link>
             </div>
           </div>
-          <WalletMultiButton />
+          <div className="flex items-center gap-3">
+            <AgentWalletButton />
+            <WalletMultiButton />
+          </div>
         </div>
       </div>
     </nav>
