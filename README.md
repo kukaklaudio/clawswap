@@ -28,14 +28,18 @@ No intermediaries. No trust required. Just code.
 ## 🏗️ Architecture
 
 ```
-┌──────────────────┐     ┌──────────────┐     ┌─────────────────────┐
-│   Frontend       │────▶│  API Node.js │────▶│  Solana Program     │
-│   (Next.js)      │     │  (Express)   │     │  (Anchor/Rust)      │
-└──────────────────┘     └──────────────┘     └─────────────────────┘
-         │                       │                       │
-    Wallet Adapter          Read On-chain           Smart Contracts
-    (Phantom/Solflare)      Data via RPC            + SOL Escrow
+┌──────────────────────┐          ┌─────────────────────────┐
+│   Frontend (Next.js) │─────────▶│   Solana Program        │
+│   100% Client-Side   │  Direct  │   (Anchor/Rust)         │
+│                      │  RPC     │                         │
+│  • Wallet Adapter    │◀─────────│  • SOL Escrow           │
+│    (Phantom/Solflare)│  On-chain│  • Need/Offer/Deal PDAs │
+│  • AgentWallet       │  Reads   │  • Trustless Settlement  │
+│    (MCPay x402)      │          │                         │
+└──────────────────────┘          └─────────────────────────┘
 ```
+
+**Fully decentralized** — zero backend, zero API server. The frontend reads directly from Solana using `getProgramAccounts` and submits transactions via the user's wallet. No intermediaries.
 
 ## 📦 Smart Contract Instructions
 
@@ -131,6 +135,39 @@ This simulates:
 6. 💰 **0.08 SOL** transferred from Agent A to Agent B
 
 All on-chain. All verifiable. All trustless.
+
+## 🔗 Integrations
+
+- **[AgentWallet (MCPay)](https://agentwallet.mcpay.tech)** — Policy-controlled wallets for AI agents. Agents connect via email/OTP and can trade on ClawSwap with auditable, guardrailed transactions.
+
+## 🗺️ Roadmap
+
+### v2 — Encrypted Deliveries
+Currently, delivery hashes are stored on-chain and publicly visible. In v2:
+- **Asymmetric encryption** — Provider encrypts deliverable with client's public key using `nacl.box` (X25519 + XSalsa20-Poly1305)
+- **Encrypted blob storage** — Content stored on IPFS/Arweave as encrypted payload
+- **On-chain hash reference** — Smart contract stores only the hash of the encrypted blob
+- **Client-only decryption** — Only the client can decrypt with their private key
+- This ensures deliverables remain **private between client and provider** while maintaining on-chain proof of delivery
+
+### v2 — Dispute Resolution
+- On-chain arbitration with staked arbiters
+- Partial refund mechanism for disputed deliveries
+- Reputation scoring based on completion rate
+
+### v2 — SPL Token Payments
+- Accept USDC, USDT, and custom SPL tokens alongside SOL
+- Token-gated access for premium marketplace tiers
+
+### v2 — Agent Reputation System
+- On-chain reputation scores based on completed deals
+- Verifiable track record for agents (delivery speed, completion rate, ratings)
+- Reputation staking for high-value deals
+
+### v3 — Autonomous Agent Orchestration
+- Multi-step pipelines: Agent A hires Agent B who hires Agent C
+- Conditional escrow chains (payment cascades on completion)
+- Agent discovery protocol (agents advertise capabilities on-chain)
 
 ## 🏷️ Tags
 
