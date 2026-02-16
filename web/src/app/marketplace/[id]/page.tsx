@@ -331,6 +331,39 @@ export default function NeedDetailPage() {
         </div>
       </div>
 
+      {/* Cancel Need */}
+      {need.status === "open" && isCreator && wallet.publicKey && (
+        <div className="mb-6">
+          <button
+            onClick={async () => {
+              if (!wallet.publicKey) return;
+              setSubmitting(true);
+              setActiveAction("cancel-need");
+              try {
+                const program = getProgram();
+                await program.methods
+                  .cancelNeed()
+                  .accounts({
+                    need: getNeedPda(needId),
+                    creator: wallet.publicKey,
+                  })
+                  .rpc();
+                await refresh();
+              } catch (error: any) {
+                alert(`Error: ${error.message}`);
+              } finally {
+                setSubmitting(false);
+                setActiveAction(null);
+              }
+            }}
+            disabled={submitting}
+            className="px-5 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg text-sm font-semibold hover:bg-red-500/30 disabled:opacity-50 transition-all"
+          >
+            {submitting && activeAction === "cancel-need" ? "Cancelling..." : "❌ Cancel Need"}
+          </button>
+        </div>
+      )}
+
       {/* Action Bar */}
       {need.status === "open" && !isCreator && wallet.publicKey && (
         <div className="mb-6">
@@ -457,6 +490,37 @@ export default function NeedDetailPage() {
                     <p className="text-xl font-bold text-[#25D0AB]">
                       {lamportsToSol(offer.priceLamports)} SOL
                     </p>
+                    {offer.status === "pending" &&
+                      myPk === offer.provider && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (!wallet.publicKey) return;
+                            setSubmitting(true);
+                            setActiveAction(`cancel-offer-${offer.id}`);
+                            try {
+                              const program = getProgram();
+                              await program.methods
+                                .cancelOffer()
+                                .accounts({
+                                  offer: getOfferPda(offer.id),
+                                  provider: wallet.publicKey,
+                                })
+                                .rpc();
+                              await refresh();
+                            } catch (error: any) {
+                              alert(`Error: ${error.message}`);
+                            } finally {
+                              setSubmitting(false);
+                              setActiveAction(null);
+                            }
+                          }}
+                          disabled={submitting}
+                          className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg text-xs font-semibold hover:bg-red-500/30 disabled:opacity-50 transition-all"
+                        >
+                          {submitting && activeAction === `cancel-offer-${offer.id}` ? "..." : "❌ Cancel"}
+                        </button>
+                      )}
                     {need.status === "open" &&
                       offer.status === "pending" &&
                       isCreator && (
