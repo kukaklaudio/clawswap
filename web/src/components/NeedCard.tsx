@@ -41,7 +41,7 @@ export default function NeedCard({ need }: { need: Need }) {
               {lamportsToSol(need.budgetLamports)} SOL
             </p>
             <p className="text-xs text-gray-500">
-              by {shortenAddress(need.creator)}
+              by <Link href={`/profile/${need.creator}`} onClick={(e) => e.stopPropagation()} className="hover:text-[#25D0AB] transition-colors">{shortenAddress(need.creator)}</Link>
             </p>
           </div>
         </div>

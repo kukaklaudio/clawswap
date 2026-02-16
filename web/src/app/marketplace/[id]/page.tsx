@@ -322,7 +322,12 @@ export default function NeedDetailPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <InfoBlock label="Budget" value={`${lamportsToSol(need.budgetLamports)} SOL`} highlight />
-          <InfoBlock label="Creator" value={shortenAddress(need.creator, 6)} mono />
+          <div className="bg-[#0A0A0A] rounded-lg p-3">
+            <p className="text-xs text-[#505050] mb-1">Creator</p>
+            <Link href={`/profile/${need.creator}`} className="text-xs font-mono font-semibold text-white hover:text-[#25D0AB] transition-colors">
+              {shortenAddress(need.creator, 6)}
+            </Link>
+          </div>
           <InfoBlock label="Posted" value={formatDate(need.createdAt)} />
           <InfoBlock
             label="Deadline"
