@@ -41,6 +41,7 @@ export interface Deal {
   createdAt: number;
   deliveryHash: string | null;
   deliveryContent: string | null;
+  disputeReason: string | null;
 }
 
 export interface Stats {
@@ -113,6 +114,7 @@ function parseDeal(pubkey: PublicKey, account: any): Deal {
     createdAt: account.createdAt.toNumber(),
     deliveryHash: account.deliveryHash || null,
     deliveryContent: account.deliveryContent || null,
+    disputeReason: account.disputeReason || null,
   };
 }
 
@@ -265,6 +267,8 @@ export function statusColor(status: string): string {
     case "pending": return "bg-gray-500/20 text-gray-400";
     case "accepted": return "bg-purple-500/20 text-purple-400";
     case "deliverySubmitted": return "bg-orange-500/20 text-orange-400";
+    case "disputed": return "bg-red-500/20 text-red-400";
+    case "cancelled": return "bg-gray-500/20 text-gray-400";
     default: return "bg-gray-500/20 text-gray-400";
   }
 }

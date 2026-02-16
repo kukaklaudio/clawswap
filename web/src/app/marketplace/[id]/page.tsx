@@ -38,6 +38,8 @@ export default function NeedDetailPage() {
   const [offerForm, setOfferForm] = useState({ price: "", message: "" });
   const [deliveryHash, setDeliveryHash] = useState("");
   const [deliveryContent, setDeliveryContent] = useState("");
+  const [disputeReason, setDisputeReason] = useState("");
+  const [showDisputeForm, setShowDisputeForm] = useState<number | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -203,6 +205,57 @@ export default function NeedDetailPage() {
         })
         .rpc();
 
+      await refresh();
+    } catch (error: any) {
+      alert(`Error: ${error.message}`);
+    } finally {
+      setSubmitting(false);
+      setActiveAction(null);
+    }
+  };
+
+  const handleRaiseDispute = async (deal: Deal) => {
+    if (!wallet.publicKey || !disputeReason) return;
+    setSubmitting(true);
+    setActiveAction(`dispute-${deal.id}`);
+    try {
+      const program = getProgram();
+      await program.methods
+        .raiseDispute(disputeReason)
+        .accounts({
+          deal: getDealPda(deal.id),
+          caller: wallet.publicKey,
+        })
+        .rpc();
+      setDisputeReason("");
+      setShowDisputeForm(null);
+      await refresh();
+    } catch (error: any) {
+      alert(`Error: ${error.message}`);
+    } finally {
+      setSubmitting(false);
+      setActiveAction(null);
+    }
+  };
+
+  const handleResolveDispute = async (deal: Deal, resolution: "refundClient" | "payProvider") => {
+    if (!wallet.publicKey) return;
+    setSubmitting(true);
+    setActiveAction(`resolve-${deal.id}-${resolution}`);
+    try {
+      const program = getProgram();
+      const resolutionArg = resolution === "refundClient" ? { refundClient: {} } : { payProvider: {} };
+      await program.methods
+        .resolveDispute(resolutionArg)
+        .accounts({
+          global: getGlobalPda(),
+          deal: getDealPda(deal.id),
+          need: getNeedPda(deal.needId),
+          authority: wallet.publicKey,
+          client: new PublicKey(deal.client),
+          provider: new PublicKey(deal.provider),
+        })
+        .rpc();
       await refresh();
     } catch (error: any) {
       alert(`Error: ${error.message}`);
@@ -582,6 +635,75 @@ export default function NeedDetailPage() {
                     </div>
                   )}
 
+                  {/* Dispute Button */}
+                  {(deal.status === "inProgress" || deal.status === "deliverySubmitted") && (isClient || isProvider) && (
+                    <div className="mt-3">
+                      {showDisputeForm === deal.id ? (
+                        <div className="bg-red-500/10 rounded-lg p-4 border border-red-500/20">
+                          <p className="text-sm text-[#7E7E7E] mb-3">⚠️ Raise a dispute:</p>
+                          <textarea
+                            value={disputeReason}
+                            onChange={(e) => setDisputeReason(e.target.value)}
+                            maxLength={256}
+                            rows={3}
+                            placeholder="Describe the reason for your dispute..."
+                            className="w-full bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-3 py-2 text-white text-sm focus:border-red-400 focus:outline-none resize-none mb-2"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleRaiseDispute(deal)}
+                              disabled={submitting || !disputeReason}
+                              className="px-5 py-2 bg-red-500 rounded-lg text-sm font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-white"
+                            >
+                              {submitting && activeAction === `dispute-${deal.id}` ? "Submitting..." : "⚠️ Submit Dispute"}
+                            </button>
+                            <button
+                              onClick={() => { setShowDisputeForm(null); setDisputeReason(""); }}
+                              className="px-5 py-2 bg-white/5 border border-white/[0.06] rounded-lg text-sm hover:bg-white/10 transition-all"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setShowDisputeForm(deal.id)}
+                          className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          ⚠️ Raise Dispute
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Disputed */}
+                  {deal.status === "disputed" && (
+                    <div className="bg-red-500/10 rounded-lg p-4 border border-red-500/20">
+                      <p className="text-sm text-red-400 font-medium mb-2">⚠️ Deal Disputed</p>
+                      {deal.disputeReason && (
+                        <p className="text-sm text-[#7E7E7E] mb-3">Reason: {deal.disputeReason}</p>
+                      )}
+                      {/* Resolution UI - only visible to authority (anyone can try, contract enforces) */}
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          onClick={() => handleResolveDispute(deal, "refundClient")}
+                          disabled={submitting}
+                          className="px-4 py-2 bg-blue-500 rounded-lg text-sm font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-white"
+                        >
+                          {submitting && activeAction === `resolve-${deal.id}-refundClient` ? "..." : "💰 Refund Client"}
+                        </button>
+                        <button
+                          onClick={() => handleResolveDispute(deal, "payProvider")}
+                          disabled={submitting}
+                          className="px-4 py-2 bg-[#25D0AB] rounded-lg text-sm font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-[#0A0A0A]"
+                        >
+                          {submitting && activeAction === `resolve-${deal.id}-payProvider` ? "..." : "✅ Pay Provider"}
+                        </button>
+                      </div>
+                      <p className="text-xs text-[#505050] mt-2">Only the platform authority can resolve disputes.</p>
+                    </div>
+                  )}
+
                   {/* Completed */}
                   {deal.status === "completed" && (
                     <div className="bg-[#25D0AB]/10 rounded-lg p-4 border border-[#25D0AB]/20 text-center">
@@ -590,6 +712,14 @@ export default function NeedDetailPage() {
                         Deal completed! {lamportsToSol(deal.amountLamports)} SOL
                         transferred to provider.
                       </p>
+                    </div>
+                  )}
+
+                  {/* Cancelled */}
+                  {deal.status === "cancelled" && (
+                    <div className="bg-gray-500/10 rounded-lg p-4 border border-gray-500/20 text-center">
+                      <span className="text-2xl">❌</span>
+                      <p className="text-sm text-gray-400 mt-1">Deal cancelled. Funds refunded to client.</p>
                     </div>
                   )}
                 </div>

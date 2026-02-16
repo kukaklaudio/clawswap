@@ -104,6 +104,91 @@
       "args": []
     },
     {
+      "name": "cancel_need",
+      "discriminator": [
+        45,
+        237,
+        227,
+        249,
+        203,
+        182,
+        202,
+        29
+      ],
+      "accounts": [
+        {
+          "name": "need",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  110,
+                  101,
+                  101,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "need.id",
+                "account": "Need"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "cancel_offer",
+      "discriminator": [
+        92,
+        203,
+        223,
+        40,
+        92,
+        89,
+        53,
+        119
+      ],
+      "accounts": [
+        {
+          "name": "offer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  102,
+                  102,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "offer.id",
+                "account": "Offer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "provider",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "confirm_delivery",
       "discriminator": [
         11,
@@ -385,6 +470,137 @@
       ]
     },
     {
+      "name": "raise_dispute",
+      "discriminator": [
+        41,
+        243,
+        1,
+        51,
+        150,
+        95,
+        246,
+        73
+      ],
+      "accounts": [
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "dispute_reason",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "resolve_dispute",
+      "discriminator": [
+        231,
+        6,
+        202,
+        6,
+        96,
+        103,
+        12,
+        230
+      ],
+      "accounts": [
+        {
+          "name": "global"
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "need",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  110,
+                  101,
+                  101,
+                  100
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "need.id",
+                "account": "Need"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "client",
+          "writable": true
+        },
+        {
+          "name": "provider",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "resolution",
+          "type": {
+            "defined": {
+              "name": "DisputeResolution"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "submit_delivery",
       "discriminator": [
         217,
@@ -531,6 +747,45 @@
       ]
     },
     {
+      "name": "DisputeRaised",
+      "discriminator": [
+        246,
+        167,
+        109,
+        37,
+        142,
+        45,
+        38,
+        176
+      ]
+    },
+    {
+      "name": "DisputeResolved",
+      "discriminator": [
+        121,
+        64,
+        249,
+        153,
+        139,
+        128,
+        236,
+        187
+      ]
+    },
+    {
+      "name": "NeedCancelled",
+      "discriminator": [
+        100,
+        186,
+        144,
+        106,
+        134,
+        115,
+        59,
+        57
+      ]
+    },
+    {
       "name": "NeedCreated",
       "discriminator": [
         77,
@@ -541,6 +796,19 @@
         72,
         231,
         208
+      ]
+    },
+    {
+      "name": "OfferCancelled",
+      "discriminator": [
+        45,
+        42,
+        175,
+        214,
+        51,
+        192,
+        154,
+        9
       ]
     },
     {
@@ -597,6 +865,31 @@
       "code": 6007,
       "name": "DeliveryContentTooLong",
       "msg": "Delivery content exceeds 512 characters"
+    },
+    {
+      "code": 6008,
+      "name": "DealNotDisputable",
+      "msg": "Deal cannot be disputed in current status"
+    },
+    {
+      "code": 6009,
+      "name": "NotDealParticipant",
+      "msg": "Not a participant in this deal"
+    },
+    {
+      "code": 6010,
+      "name": "DisputeReasonTooLong",
+      "msg": "Dispute reason exceeds 256 characters"
+    },
+    {
+      "code": 6011,
+      "name": "DealNotDisputed",
+      "msg": "Deal is not disputed"
+    },
+    {
+      "code": 6012,
+      "name": "NotAuthority",
+      "msg": "Not the global authority"
     }
   ],
   "types": [
@@ -649,6 +942,12 @@
           },
           {
             "name": "delivery_content",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "dispute_reason",
             "type": {
               "option": "string"
             }
@@ -764,6 +1063,60 @@
       }
     },
     {
+      "name": "DisputeRaised",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "deal_id",
+            "type": "u64"
+          },
+          {
+            "name": "raised_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisputeResolution",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RefundClient"
+          },
+          {
+            "name": "PayProvider"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisputeResolved",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "deal_id",
+            "type": "u64"
+          },
+          {
+            "name": "resolution",
+            "type": {
+              "defined": {
+                "name": "DisputeResolution"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "Global",
       "type": {
         "kind": "struct",
@@ -841,6 +1194,22 @@
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NeedCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
           }
         ]
       }
@@ -929,6 +1298,22 @@
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OfferCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "provider",
+            "type": "pubkey"
           }
         ]
       }

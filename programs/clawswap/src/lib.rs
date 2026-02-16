@@ -123,6 +123,7 @@ pub mod clawswap {
         deal.created_at = Clock::get()?.unix_timestamp;
         deal.delivery_hash = None;
         deal.delivery_content = None;
+        deal.dispute_reason = None;
         deal.bump = ctx.bumps.deal;
 
         global.deal_counter += 1;
@@ -159,6 +160,93 @@ pub mod clawswap {
             provider: deal.provider,
             delivery_hash,
             delivery_content,
+        });
+
+        Ok(())
+    }
+
+    pub fn raise_dispute(ctx: Context<RaiseDispute>, dispute_reason: String) -> Result<()> {
+        let deal = &mut ctx.accounts.deal;
+        let caller = ctx.accounts.caller.key();
+
+        require!(
+            deal.status == DealStatus::InProgress || deal.status == DealStatus::DeliverySubmitted,
+            ErrorCode::DealNotDisputable
+        );
+        require!(
+            caller == deal.client || caller == deal.provider,
+            ErrorCode::NotDealParticipant
+        );
+        require!(dispute_reason.len() <= 256, ErrorCode::DisputeReasonTooLong);
+
+        deal.status = DealStatus::Disputed;
+        deal.dispute_reason = Some(dispute_reason.clone());
+
+        emit!(DisputeRaised {
+            deal_id: deal.id,
+            raised_by: caller,
+            reason: dispute_reason,
+        });
+
+        Ok(())
+    }
+
+    pub fn resolve_dispute(ctx: Context<ResolveDispute>, resolution: DisputeResolution) -> Result<()> {
+        let deal = &mut ctx.accounts.deal;
+        let need = &mut ctx.accounts.need;
+        let global = &ctx.accounts.global;
+
+        require!(deal.status == DealStatus::Disputed, ErrorCode::DealNotDisputed);
+        require!(ctx.accounts.authority.key() == global.authority, ErrorCode::NotAuthority);
+
+        let amount = deal.amount_lamports;
+
+        match resolution {
+            DisputeResolution::RefundClient => {
+                **deal.to_account_info().lamports.borrow_mut() -= amount;
+                **ctx.accounts.client.lamports.borrow_mut() += amount;
+                deal.status = DealStatus::Cancelled;
+                need.status = NeedStatus::Cancelled;
+            }
+            DisputeResolution::PayProvider => {
+                **deal.to_account_info().lamports.borrow_mut() -= amount;
+                **ctx.accounts.provider.lamports.borrow_mut() += amount;
+                deal.status = DealStatus::Completed;
+                need.status = NeedStatus::Completed;
+            }
+        }
+
+        emit!(DisputeResolved {
+            deal_id: deal.id,
+            resolution: resolution.clone(),
+        });
+
+        Ok(())
+    }
+
+    pub fn cancel_need(ctx: Context<CancelNeed>) -> Result<()> {
+        let need = &mut ctx.accounts.need;
+        require!(need.status == NeedStatus::Open, ErrorCode::NeedNotOpen);
+        require!(need.creator == ctx.accounts.creator.key(), ErrorCode::NotNeedCreator);
+        need.status = NeedStatus::Cancelled;
+
+        emit!(NeedCancelled {
+            id: need.id,
+            creator: need.creator,
+        });
+
+        Ok(())
+    }
+
+    pub fn cancel_offer(ctx: Context<CancelOffer>) -> Result<()> {
+        let offer = &mut ctx.accounts.offer;
+        require!(offer.status == OfferStatus::Pending, ErrorCode::OfferNotPending);
+        require!(offer.provider == ctx.accounts.provider.key(), ErrorCode::NotProvider);
+        offer.status = OfferStatus::Cancelled;
+
+        emit!(OfferCancelled {
+            id: offer.id,
+            provider: offer.provider,
         });
 
         Ok(())
@@ -322,6 +410,71 @@ pub struct ConfirmDelivery<'info> {
     pub provider: UncheckedAccount<'info>,
 }
 
+#[derive(Accounts)]
+pub struct RaiseDispute<'info> {
+    #[account(
+        mut,
+        seeds = [b"deal", deal.id.to_le_bytes().as_ref()],
+        bump = deal.bump
+    )]
+    pub deal: Account<'info, Deal>,
+
+    pub caller: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct ResolveDispute<'info> {
+    pub global: Account<'info, Global>,
+
+    #[account(
+        mut,
+        seeds = [b"deal", deal.id.to_le_bytes().as_ref()],
+        bump = deal.bump
+    )]
+    pub deal: Account<'info, Deal>,
+
+    #[account(
+        mut,
+        seeds = [b"need", need.id.to_le_bytes().as_ref()],
+        bump = need.bump
+    )]
+    pub need: Account<'info, Need>,
+
+    pub authority: Signer<'info>,
+
+    /// CHECK: Client account to receive refund
+    #[account(mut)]
+    pub client: UncheckedAccount<'info>,
+
+    /// CHECK: Provider account to receive payment
+    #[account(mut)]
+    pub provider: UncheckedAccount<'info>,
+}
+
+#[derive(Accounts)]
+pub struct CancelNeed<'info> {
+    #[account(
+        mut,
+        seeds = [b"need", need.id.to_le_bytes().as_ref()],
+        bump = need.bump
+    )]
+    pub need: Account<'info, Need>,
+
+    pub creator: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct CancelOffer<'info> {
+    #[account(
+        mut,
+        seeds = [b"offer", offer.id.to_le_bytes().as_ref()],
+        bump = offer.bump
+    )]
+    pub offer: Account<'info, Offer>,
+
+    pub provider: Signer<'info>,
+}
+
 // Data structs
 #[account]
 pub struct Global {
@@ -382,12 +535,14 @@ pub struct Deal {
     pub created_at: i64,
     pub delivery_hash: Option<String>,
     pub delivery_content: Option<String>,
+    pub dispute_reason: Option<String>,
     pub bump: u8,
 }
 
 impl Deal {
     // +1 (Option) +4 (String len) +512 (max content) for delivery_content
-    pub const SIZE: usize = 8 + 8 + 8 + 8 + 32 + 32 + 8 + 1 + 8 + (1 + 4 + 64) + (1 + 4 + 512) + 1;
+    // +1 (Option) +4 (String len) +256 (max dispute_reason)
+    pub const SIZE: usize = 8 + 8 + 8 + 8 + 32 + 32 + 8 + 1 + 8 + (1 + 4 + 64) + (1 + 4 + 512) + (1 + 4 + 256) + 1;
 }
 
 // Enums
@@ -405,6 +560,12 @@ pub enum OfferStatus {
     Accepted,
     Rejected,
     Cancelled,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+pub enum DisputeResolution {
+    RefundClient,
+    PayProvider,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
@@ -459,6 +620,31 @@ pub struct DeliveryConfirmed {
     pub amount_lamports: u64,
 }
 
+#[event]
+pub struct DisputeRaised {
+    pub deal_id: u64,
+    pub raised_by: Pubkey,
+    pub reason: String,
+}
+
+#[event]
+pub struct DisputeResolved {
+    pub deal_id: u64,
+    pub resolution: DisputeResolution,
+}
+
+#[event]
+pub struct NeedCancelled {
+    pub id: u64,
+    pub creator: Pubkey,
+}
+
+#[event]
+pub struct OfferCancelled {
+    pub id: u64,
+    pub provider: Pubkey,
+}
+
 // Errors
 #[error_code]
 pub enum ErrorCode {
@@ -478,4 +664,14 @@ pub enum ErrorCode {
     NotClient,
     #[msg("Delivery content exceeds 512 characters")]
     DeliveryContentTooLong,
+    #[msg("Deal cannot be disputed in current status")]
+    DealNotDisputable,
+    #[msg("Not a participant in this deal")]
+    NotDealParticipant,
+    #[msg("Dispute reason exceeds 256 characters")]
+    DisputeReasonTooLong,
+    #[msg("Deal is not disputed")]
+    DealNotDisputed,
+    #[msg("Not the global authority")]
+    NotAuthority,
 }
