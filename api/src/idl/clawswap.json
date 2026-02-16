@@ -8,6 +8,50 @@
   },
   "instructions": [
     {
+      "name": "accept_barter",
+      "discriminator": [
+        226,
+        76,
+        88,
+        216,
+        221,
+        226,
+        37,
+        32
+      ],
+      "accounts": [
+        {
+          "name": "barter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  114,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "barter.id",
+                "account": "Barter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "accept_offer",
       "discriminator": [
         227,
@@ -104,6 +148,50 @@
       "args": []
     },
     {
+      "name": "cancel_barter",
+      "discriminator": [
+        22,
+        208,
+        208,
+        59,
+        151,
+        181,
+        218,
+        195
+      ],
+      "accounts": [
+        {
+          "name": "barter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  114,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "barter.id",
+                "account": "Barter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "initiator",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "cancel_need",
       "discriminator": [
         45,
@@ -189,6 +277,50 @@
       "args": []
     },
     {
+      "name": "confirm_barter_side",
+      "discriminator": [
+        226,
+        114,
+        185,
+        45,
+        140,
+        6,
+        208,
+        178
+      ],
+      "accounts": [
+        {
+          "name": "barter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  114,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "barter.id",
+                "account": "Barter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "confirm_delivery",
       "discriminator": [
         11,
@@ -256,6 +388,74 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "create_barter",
+      "discriminator": [
+        90,
+        70,
+        96,
+        215,
+        213,
+        70,
+        18,
+        124
+      ],
+      "accounts": [
+        {
+          "name": "global",
+          "writable": true
+        },
+        {
+          "name": "barter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  114,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "global.barter_counter",
+                "account": "Global"
+              }
+            ]
+          }
+        },
+        {
+          "name": "initiator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "what_i_offer",
+          "type": "string"
+        },
+        {
+          "name": "what_i_want",
+          "type": "string"
+        },
+        {
+          "name": "target_agent",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
     },
     {
       "name": "create_need",
@@ -412,6 +612,55 @@
         },
         {
           "name": "message",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "dispute_barter",
+      "discriminator": [
+        157,
+        184,
+        21,
+        147,
+        130,
+        141,
+        195,
+        200
+      ],
+      "accounts": [
+        {
+          "name": "barter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  114,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "barter.id",
+                "account": "Barter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "reason",
           "type": "string"
         }
       ]
@@ -601,6 +850,59 @@
       ]
     },
     {
+      "name": "submit_barter_delivery",
+      "discriminator": [
+        32,
+        64,
+        155,
+        76,
+        100,
+        144,
+        9,
+        118
+      ],
+      "accounts": [
+        {
+          "name": "barter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  114,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "barter.id",
+                "account": "Barter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "caller",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "delivery_content",
+          "type": "string"
+        },
+        {
+          "name": "delivery_hash",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "submit_delivery",
       "discriminator": [
         217,
@@ -653,6 +955,19 @@
     }
   ],
   "accounts": [
+    {
+      "name": "Barter",
+      "discriminator": [
+        119,
+        84,
+        239,
+        110,
+        47,
+        91,
+        200,
+        167
+      ]
+    },
     {
       "name": "Deal",
       "discriminator": [
@@ -707,6 +1022,97 @@
     }
   ],
   "events": [
+    {
+      "name": "BarterAccepted",
+      "discriminator": [
+        85,
+        52,
+        65,
+        231,
+        118,
+        32,
+        146,
+        68
+      ]
+    },
+    {
+      "name": "BarterCancelled",
+      "discriminator": [
+        214,
+        88,
+        49,
+        175,
+        109,
+        244,
+        50,
+        3
+      ]
+    },
+    {
+      "name": "BarterCompleted",
+      "discriminator": [
+        0,
+        22,
+        78,
+        253,
+        164,
+        146,
+        27,
+        120
+      ]
+    },
+    {
+      "name": "BarterConfirmed",
+      "discriminator": [
+        206,
+        49,
+        200,
+        100,
+        44,
+        56,
+        157,
+        111
+      ]
+    },
+    {
+      "name": "BarterCreated",
+      "discriminator": [
+        100,
+        73,
+        199,
+        253,
+        1,
+        236,
+        30,
+        35
+      ]
+    },
+    {
+      "name": "BarterDeliverySubmitted",
+      "discriminator": [
+        138,
+        207,
+        72,
+        220,
+        164,
+        200,
+        29,
+        215
+      ]
+    },
+    {
+      "name": "BarterDisputed",
+      "discriminator": [
+        215,
+        96,
+        224,
+        56,
+        86,
+        82,
+        135,
+        15
+      ]
+    },
     {
       "name": "DealCreated",
       "discriminator": [
@@ -890,9 +1296,279 @@
       "code": 6012,
       "name": "NotAuthority",
       "msg": "Not the global authority"
+    },
+    {
+      "code": 6013,
+      "name": "BarterNotOpen",
+      "msg": "Barter is not open"
+    },
+    {
+      "code": 6014,
+      "name": "BarterNotInProgress",
+      "msg": "Barter is not in progress"
+    },
+    {
+      "code": 6015,
+      "name": "NotBarterParticipant",
+      "msg": "Not a participant in this barter"
+    },
+    {
+      "code": 6016,
+      "name": "CannotAcceptOwnBarter",
+      "msg": "Cannot accept your own barter"
+    },
+    {
+      "code": 6017,
+      "name": "BarterOfferTooLong",
+      "msg": "Barter offer description too long"
+    },
+    {
+      "code": 6018,
+      "name": "BarterWantTooLong",
+      "msg": "Barter want description too long"
+    },
+    {
+      "code": 6019,
+      "name": "WrongBarterTarget",
+      "msg": "Wrong barter target"
+    },
+    {
+      "code": 6020,
+      "name": "DeliveryNotReady",
+      "msg": "Delivery not ready for confirmation"
+    },
+    {
+      "code": 6021,
+      "name": "BarterNotInitiator",
+      "msg": "Not the barter initiator"
     }
   ],
   "types": [
+    {
+      "name": "Barter",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "initiator",
+            "type": "pubkey"
+          },
+          {
+            "name": "counterpart",
+            "type": "pubkey"
+          },
+          {
+            "name": "what_i_offer",
+            "type": "string"
+          },
+          {
+            "name": "what_i_want",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "BarterStatus"
+              }
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "side_a_delivery",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "side_a_hash",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "side_a_confirmed",
+            "type": "bool"
+          },
+          {
+            "name": "side_b_delivery",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "side_b_hash",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "side_b_confirmed",
+            "type": "bool"
+          },
+          {
+            "name": "dispute_reason",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BarterAccepted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "counterpart",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BarterCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BarterCompleted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BarterConfirmed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "barter_id",
+            "type": "u64"
+          },
+          {
+            "name": "confirmed_by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BarterCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "initiator",
+            "type": "pubkey"
+          },
+          {
+            "name": "what_i_offer",
+            "type": "string"
+          },
+          {
+            "name": "what_i_want",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BarterDeliverySubmitted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "barter_id",
+            "type": "u64"
+          },
+          {
+            "name": "side",
+            "type": "string"
+          },
+          {
+            "name": "delivery_hash",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BarterDisputed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "raised_by",
+            "type": "pubkey"
+          },
+          {
+            "name": "reason",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BarterStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "InProgress"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Disputed"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    },
     {
       "name": "Deal",
       "type": {
@@ -1135,6 +1811,10 @@
           },
           {
             "name": "deal_counter",
+            "type": "u64"
+          },
+          {
+            "name": "barter_counter",
             "type": "u64"
           },
           {

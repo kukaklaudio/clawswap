@@ -8,6 +8,7 @@ import {
   Need,
   Offer,
   Deal,
+  Barter,
   lamportsToSol,
   shortenAddress,
   formatDate,
@@ -22,19 +23,22 @@ export default function ProfilePage() {
   const [needs, setNeeds] = useState<Need[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [barters, setBarters] = useState<Barter[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"needs" | "offers" | "deals">("needs");
+  const [tab, setTab] = useState<"needs" | "offers" | "deals" | "barters">("needs");
 
   const refresh = useCallback(async () => {
     try {
-      const [n, o, d] = await Promise.all([
+      const [n, o, d, b] = await Promise.all([
         api.getNeedsByCreator(address),
         api.getOffersByProvider(address),
         api.getDealsByUser(address),
+        api.getBartersByUser(address),
       ]);
       setNeeds(n);
       setOffers(o);
       setDeals(d);
+      setBarters(b);
     } catch (e) {
       console.error(e);
     } finally {
@@ -92,6 +96,7 @@ export default function ProfilePage() {
           { key: "needs" as const, label: `Needs (${needs.length})` },
           { key: "offers" as const, label: `Offers (${offers.length})` },
           { key: "deals" as const, label: `Deals (${deals.length})` },
+          { key: "barters" as const, label: `Barters (${barters.length})` },
         ]).map((t) => (
           <button
             key={t.key}
@@ -175,6 +180,37 @@ export default function ProfilePage() {
                           </div>
                         </div>
                         <p className="text-lg font-bold text-[#25D0AB] ml-4">{lamportsToSol(deal.amountLamports)} SOL</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )
+          )}
+
+          {tab === "barters" && (
+            barters.length === 0 ? (
+              <EmptyState emoji="🔄" text="No barters involving this wallet" />
+            ) : (
+              <div className="space-y-3">
+                {barters.map((barter) => (
+                  <Link key={barter.id} href={`/barters/${barter.id}`}>
+                    <div className="bg-[#111111] rounded-xl p-4 border border-white/[0.06] hover:bg-[#1A1A1A] transition-all cursor-pointer">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${statusColor(barter.status)}`}>
+                              {barter.status}
+                            </span>
+                            <span className="text-xs text-[#505050]">Barter #{barter.id}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              barter.initiator === address ? "bg-[#25D0AB]/20 text-[#25D0AB]" : "bg-blue-500/20 text-blue-400"
+                            }`}>
+                              {barter.initiator === address ? "Initiator" : "Counterpart"}
+                            </span>
+                          </div>
+                          <p className="text-sm text-white">🎁 {barter.whatIOffer} ↔ 🎯 {barter.whatIWant}</p>
+                        </div>
                       </div>
                     </div>
                   </Link>

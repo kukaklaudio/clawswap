@@ -12,6 +12,7 @@ pub mod clawswap {
         global.need_counter = 0;
         global.offer_counter = 0;
         global.deal_counter = 0;
+        global.barter_counter = 0;
         global.bump = ctx.bumps.global;
         Ok(())
     }
@@ -252,6 +253,175 @@ pub mod clawswap {
         Ok(())
     }
 
+    // ── Barter Instructions ──
+
+    pub fn create_barter(
+        ctx: Context<CreateBarter>,
+        what_i_offer: String,
+        what_i_want: String,
+        target_agent: Option<Pubkey>,
+    ) -> Result<()> {
+        require!(what_i_offer.len() <= 256, ErrorCode::BarterOfferTooLong);
+        require!(what_i_want.len() <= 256, ErrorCode::BarterWantTooLong);
+
+        let global = &mut ctx.accounts.global;
+        let barter = &mut ctx.accounts.barter;
+
+        barter.id = global.barter_counter;
+        barter.initiator = ctx.accounts.initiator.key();
+        barter.counterpart = target_agent.unwrap_or(Pubkey::default());
+        barter.what_i_offer = what_i_offer.clone();
+        barter.what_i_want = what_i_want.clone();
+        barter.status = BarterStatus::Open;
+        barter.created_at = Clock::get()?.unix_timestamp;
+        barter.side_a_delivery = None;
+        barter.side_a_hash = None;
+        barter.side_a_confirmed = false;
+        barter.side_b_delivery = None;
+        barter.side_b_hash = None;
+        barter.side_b_confirmed = false;
+        barter.dispute_reason = None;
+        barter.bump = ctx.bumps.barter;
+
+        global.barter_counter += 1;
+
+        emit!(BarterCreated {
+            id: barter.id,
+            initiator: barter.initiator,
+            what_i_offer,
+            what_i_want,
+        });
+
+        Ok(())
+    }
+
+    pub fn accept_barter(ctx: Context<AcceptBarter>) -> Result<()> {
+        let barter = &mut ctx.accounts.barter;
+        let caller = ctx.accounts.caller.key();
+
+        require!(barter.status == BarterStatus::Open, ErrorCode::BarterNotOpen);
+        require!(caller != barter.initiator, ErrorCode::CannotAcceptOwnBarter);
+
+        if barter.counterpart != Pubkey::default() {
+            require!(caller == barter.counterpart, ErrorCode::WrongBarterTarget);
+        } else {
+            barter.counterpart = caller;
+        }
+
+        barter.status = BarterStatus::InProgress;
+
+        emit!(BarterAccepted {
+            id: barter.id,
+            counterpart: barter.counterpart,
+        });
+
+        Ok(())
+    }
+
+    pub fn submit_barter_delivery(
+        ctx: Context<SubmitBarterDelivery>,
+        delivery_content: String,
+        delivery_hash: String,
+    ) -> Result<()> {
+        let barter = &mut ctx.accounts.barter;
+        let caller = ctx.accounts.caller.key();
+
+        require!(barter.status == BarterStatus::InProgress, ErrorCode::BarterNotInProgress);
+        require!(
+            caller == barter.initiator || caller == barter.counterpart,
+            ErrorCode::NotBarterParticipant
+        );
+        require!(delivery_content.len() <= 512, ErrorCode::DeliveryContentTooLong);
+        require!(delivery_hash.len() <= 64, ErrorCode::DeliveryContentTooLong);
+
+        let side: String;
+        if caller == barter.initiator {
+            barter.side_a_delivery = Some(delivery_content);
+            barter.side_a_hash = Some(delivery_hash.clone());
+            side = "A".to_string();
+        } else {
+            barter.side_b_delivery = Some(delivery_content);
+            barter.side_b_hash = Some(delivery_hash.clone());
+            side = "B".to_string();
+        }
+
+        emit!(BarterDeliverySubmitted {
+            barter_id: barter.id,
+            side,
+            delivery_hash,
+        });
+
+        Ok(())
+    }
+
+    pub fn confirm_barter_side(ctx: Context<ConfirmBarterSide>) -> Result<()> {
+        let barter = &mut ctx.accounts.barter;
+        let caller = ctx.accounts.caller.key();
+
+        require!(barter.status == BarterStatus::InProgress, ErrorCode::BarterNotInProgress);
+        require!(
+            caller == barter.initiator || caller == barter.counterpart,
+            ErrorCode::NotBarterParticipant
+        );
+
+        if caller == barter.initiator {
+            // Initiator confirms side B
+            require!(barter.side_b_delivery.is_some(), ErrorCode::DeliveryNotReady);
+            barter.side_b_confirmed = true;
+        } else {
+            // Counterpart confirms side A
+            require!(barter.side_a_delivery.is_some(), ErrorCode::DeliveryNotReady);
+            barter.side_a_confirmed = true;
+        }
+
+        emit!(BarterConfirmed {
+            barter_id: barter.id,
+            confirmed_by: caller,
+        });
+
+        if barter.side_a_confirmed && barter.side_b_confirmed {
+            barter.status = BarterStatus::Completed;
+            emit!(BarterCompleted { id: barter.id });
+        }
+
+        Ok(())
+    }
+
+    pub fn cancel_barter(ctx: Context<CancelBarter>) -> Result<()> {
+        let barter = &mut ctx.accounts.barter;
+        require!(barter.status == BarterStatus::Open, ErrorCode::BarterNotOpen);
+        require!(ctx.accounts.initiator.key() == barter.initiator, ErrorCode::BarterNotInitiator);
+
+        barter.status = BarterStatus::Cancelled;
+
+        emit!(BarterCancelled { id: barter.id });
+
+        Ok(())
+    }
+
+    pub fn dispute_barter(ctx: Context<DisputeBarter>, reason: String) -> Result<()> {
+        let barter = &mut ctx.accounts.barter;
+        let caller = ctx.accounts.caller.key();
+
+        require!(barter.status == BarterStatus::InProgress, ErrorCode::BarterNotInProgress);
+        require!(
+            caller == barter.initiator || caller == barter.counterpart,
+            ErrorCode::NotBarterParticipant
+        );
+        require!(reason.len() <= 256, ErrorCode::DisputeReasonTooLong);
+
+        barter.status = BarterStatus::Disputed;
+        barter.dispute_reason = Some(reason.clone());
+
+        emit!(BarterDisputed {
+            id: barter.id,
+            raised_by: caller,
+            reason,
+        });
+
+        Ok(())
+    }
+
     pub fn confirm_delivery(ctx: Context<ConfirmDelivery>) -> Result<()> {
         let deal = &mut ctx.accounts.deal;
         let need = &mut ctx.accounts.need;
@@ -475,6 +645,85 @@ pub struct CancelOffer<'info> {
     pub provider: Signer<'info>,
 }
 
+#[derive(Accounts)]
+pub struct CreateBarter<'info> {
+    #[account(mut)]
+    pub global: Account<'info, Global>,
+
+    #[account(
+        init,
+        payer = initiator,
+        space = Barter::SIZE,
+        seeds = [b"barter", global.barter_counter.to_le_bytes().as_ref()],
+        bump
+    )]
+    pub barter: Account<'info, Barter>,
+
+    #[account(mut)]
+    pub initiator: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct AcceptBarter<'info> {
+    #[account(
+        mut,
+        seeds = [b"barter", barter.id.to_le_bytes().as_ref()],
+        bump = barter.bump
+    )]
+    pub barter: Account<'info, Barter>,
+
+    pub caller: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct SubmitBarterDelivery<'info> {
+    #[account(
+        mut,
+        seeds = [b"barter", barter.id.to_le_bytes().as_ref()],
+        bump = barter.bump
+    )]
+    pub barter: Account<'info, Barter>,
+
+    pub caller: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct ConfirmBarterSide<'info> {
+    #[account(
+        mut,
+        seeds = [b"barter", barter.id.to_le_bytes().as_ref()],
+        bump = barter.bump
+    )]
+    pub barter: Account<'info, Barter>,
+
+    pub caller: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct CancelBarter<'info> {
+    #[account(
+        mut,
+        seeds = [b"barter", barter.id.to_le_bytes().as_ref()],
+        bump = barter.bump
+    )]
+    pub barter: Account<'info, Barter>,
+
+    pub initiator: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct DisputeBarter<'info> {
+    #[account(
+        mut,
+        seeds = [b"barter", barter.id.to_le_bytes().as_ref()],
+        bump = barter.bump
+    )]
+    pub barter: Account<'info, Barter>,
+
+    pub caller: Signer<'info>,
+}
+
 // Data structs
 #[account]
 pub struct Global {
@@ -482,11 +731,12 @@ pub struct Global {
     pub need_counter: u64,
     pub offer_counter: u64,
     pub deal_counter: u64,
+    pub barter_counter: u64,
     pub bump: u8,
 }
 
 impl Global {
-    pub const SIZE: usize = 8 + 32 + 8 + 8 + 8 + 1;
+    pub const SIZE: usize = 8 + 32 + 8 + 8 + 8 + 8 + 1;
 }
 
 #[account]
@@ -545,6 +795,37 @@ impl Deal {
     pub const SIZE: usize = 8 + 8 + 8 + 8 + 32 + 32 + 8 + 1 + 8 + (1 + 4 + 64) + (1 + 4 + 512) + (1 + 4 + 256) + 1;
 }
 
+#[account]
+pub struct Barter {
+    pub id: u64,
+    pub initiator: Pubkey,
+    pub counterpart: Pubkey,
+    pub what_i_offer: String,
+    pub what_i_want: String,
+    pub status: BarterStatus,
+    pub created_at: i64,
+    pub side_a_delivery: Option<String>,
+    pub side_a_hash: Option<String>,
+    pub side_a_confirmed: bool,
+    pub side_b_delivery: Option<String>,
+    pub side_b_hash: Option<String>,
+    pub side_b_confirmed: bool,
+    pub dispute_reason: Option<String>,
+    pub bump: u8,
+}
+
+impl Barter {
+    // 8 discriminator + 8 id + 32 initiator + 32 counterpart + (4+256) offer + (4+256) want
+    // + 1 status + 8 created_at
+    // + (1+4+512) side_a_delivery + (1+4+64) side_a_hash + 1 side_a_confirmed
+    // + (1+4+512) side_b_delivery + (1+4+64) side_b_hash + 1 side_b_confirmed
+    // + (1+4+256) dispute_reason + 1 bump
+    pub const SIZE: usize = 8 + 8 + 32 + 32 + (4 + 256) + (4 + 256) + 1 + 8
+        + (1 + 4 + 512) + (1 + 4 + 64) + 1
+        + (1 + 4 + 512) + (1 + 4 + 64) + 1
+        + (1 + 4 + 256) + 1;
+}
+
 // Enums
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
 pub enum NeedStatus {
@@ -572,6 +853,15 @@ pub enum DisputeResolution {
 pub enum DealStatus {
     InProgress,
     DeliverySubmitted,
+    Completed,
+    Disputed,
+    Cancelled,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+pub enum BarterStatus {
+    Open,
+    InProgress,
     Completed,
     Disputed,
     Cancelled,
@@ -645,6 +935,50 @@ pub struct OfferCancelled {
     pub provider: Pubkey,
 }
 
+#[event]
+pub struct BarterCreated {
+    pub id: u64,
+    pub initiator: Pubkey,
+    pub what_i_offer: String,
+    pub what_i_want: String,
+}
+
+#[event]
+pub struct BarterAccepted {
+    pub id: u64,
+    pub counterpart: Pubkey,
+}
+
+#[event]
+pub struct BarterDeliverySubmitted {
+    pub barter_id: u64,
+    pub side: String,
+    pub delivery_hash: String,
+}
+
+#[event]
+pub struct BarterConfirmed {
+    pub barter_id: u64,
+    pub confirmed_by: Pubkey,
+}
+
+#[event]
+pub struct BarterCompleted {
+    pub id: u64,
+}
+
+#[event]
+pub struct BarterCancelled {
+    pub id: u64,
+}
+
+#[event]
+pub struct BarterDisputed {
+    pub id: u64,
+    pub raised_by: Pubkey,
+    pub reason: String,
+}
+
 // Errors
 #[error_code]
 pub enum ErrorCode {
@@ -674,4 +1008,22 @@ pub enum ErrorCode {
     DealNotDisputed,
     #[msg("Not the global authority")]
     NotAuthority,
+    #[msg("Barter is not open")]
+    BarterNotOpen,
+    #[msg("Barter is not in progress")]
+    BarterNotInProgress,
+    #[msg("Not a participant in this barter")]
+    NotBarterParticipant,
+    #[msg("Cannot accept your own barter")]
+    CannotAcceptOwnBarter,
+    #[msg("Barter offer description too long")]
+    BarterOfferTooLong,
+    #[msg("Barter want description too long")]
+    BarterWantTooLong,
+    #[msg("Wrong barter target")]
+    WrongBarterTarget,
+    #[msg("Delivery not ready for confirmation")]
+    DeliveryNotReady,
+    #[msg("Not the barter initiator")]
+    BarterNotInitiator,
 }

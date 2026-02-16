@@ -24,6 +24,12 @@ export default function Navbar() {
                 Marketplace
               </Link>
               <Link
+                href="/barters"
+                className="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Barters
+              </Link>
+              <Link
                 href="/dashboard"
                 className="text-sm text-gray-400 hover:text-white transition-colors"
               >

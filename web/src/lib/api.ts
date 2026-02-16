@@ -44,6 +44,24 @@ export interface Deal {
   disputeReason: string | null;
 }
 
+export interface Barter {
+  publicKey: string;
+  id: number;
+  initiator: string;
+  counterpart: string;
+  whatIOffer: string;
+  whatIWant: string;
+  status: string;
+  createdAt: number;
+  sideADelivery: string | null;
+  sideAHash: string | null;
+  sideAConfirmed: boolean;
+  sideBDelivery: string | null;
+  sideBHash: string | null;
+  sideBConfirmed: boolean;
+  disputeReason: string | null;
+}
+
 export interface Stats {
   totalNeeds: number;
   openNeeds: number;
@@ -114,6 +132,26 @@ function parseDeal(pubkey: PublicKey, account: any): Deal {
     createdAt: account.createdAt.toNumber(),
     deliveryHash: account.deliveryHash || null,
     deliveryContent: account.deliveryContent || null,
+    disputeReason: account.disputeReason || null,
+  };
+}
+
+function parseBarter(pubkey: PublicKey, account: any): Barter {
+  return {
+    publicKey: pubkey.toBase58(),
+    id: account.id.toNumber(),
+    initiator: account.initiator.toBase58(),
+    counterpart: account.counterpart.toBase58(),
+    whatIOffer: account.whatIOffer,
+    whatIWant: account.whatIWant,
+    status: parseStatus(account.status),
+    createdAt: account.createdAt.toNumber(),
+    sideADelivery: account.sideADelivery || null,
+    sideAHash: account.sideAHash || null,
+    sideAConfirmed: account.sideAConfirmed,
+    sideBDelivery: account.sideBDelivery || null,
+    sideBHash: account.sideBHash || null,
+    sideBConfirmed: account.sideBConfirmed,
     disputeReason: account.disputeReason || null,
   };
 }
@@ -216,6 +254,34 @@ export const api = {
   getDealsByUser: async (pk: string): Promise<Deal[]> => {
     const allDeals = await api.getDeals();
     return allDeals.filter((d) => d.client === pk || d.provider === pk);
+  },
+
+  getBarters: async (status?: string): Promise<Barter[]> => {
+    return cached(`barters-${status || "all"}`, async () => {
+      const accounts = await (program.account as any).barter.all();
+      let barters = accounts.map((a: any) => parseBarter(a.publicKey, a.account));
+      if (status && status !== "all") {
+        barters = barters.filter((b: Barter) => b.status === status);
+      }
+      barters.sort((a: Barter, b: Barter) => b.createdAt - a.createdAt);
+      return barters;
+    });
+  },
+
+  getBarter: async (id: number): Promise<Barter> => {
+    return cached(`barter-${id}`, async () => {
+      const [barterPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("barter"), new BN(id).toArrayLike(Buffer, "le", 8)],
+        PROGRAM_ID
+      );
+      const account = await (program.account as any).barter.fetch(barterPda);
+      return parseBarter(barterPda, account);
+    });
+  },
+
+  getBartersByUser: async (pk: string): Promise<Barter[]> => {
+    const allBarters = await api.getBarters();
+    return allBarters.filter((b) => b.initiator === pk || b.counterpart === pk);
   },
 
   getStats: async (): Promise<Stats> => {
