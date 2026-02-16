@@ -484,6 +484,72 @@ app.get("/api/stats", async (_req, res) => {
   }
 });
 
+// ---- Profile ----
+
+app.get("/api/profile/:address", async (req, res) => {
+  try {
+    const address = req.params.address;
+    const userPubkey = new PublicKey(address);
+
+    const [allNeeds, allOffers, allDeals] = await Promise.all([
+      (program.account as any).need.all(),
+      (program.account as any).offer.all(),
+      (program.account as any).deal.all(),
+    ]);
+
+    const needs = allNeeds
+      .filter((a: any) => a.account.creator.toBase58() === address)
+      .map((a: any) => ({ publicKey: a.publicKey.toBase58(), ...serializeAccount(a.account) }));
+
+    const offers = allOffers
+      .filter((a: any) => a.account.provider.toBase58() === address)
+      .map((a: any) => ({ publicKey: a.publicKey.toBase58(), ...serializeAccount(a.account) }));
+
+    const deals = allDeals
+      .filter((a: any) =>
+        a.account.client.toBase58() === address ||
+        a.account.provider.toBase58() === address
+      )
+      .map((a: any) => ({ publicKey: a.publicKey.toBase58(), ...serializeAccount(a.account) }));
+
+    const completedDeals = deals.filter((d: any) => d.status === "completed");
+    const totalDeals = deals.length;
+    const reputation = totalDeals > 0 ? completedDeals.length / totalDeals : null;
+
+    const totalEarned = completedDeals
+      .filter((d: any) => d.provider === address)
+      .reduce((sum: number, d: any) => sum + (typeof d.amountLamports === 'number' ? d.amountLamports : 0), 0);
+
+    const totalSpent = completedDeals
+      .filter((d: any) => d.client === address)
+      .reduce((sum: number, d: any) => sum + (typeof d.amountLamports === 'number' ? d.amountLamports : 0), 0);
+
+    res.json({
+      success: true,
+      data: {
+        address,
+        stats: {
+          totalNeeds: needs.length,
+          totalOffers: offers.length,
+          totalDeals,
+          completedDeals: completedDeals.length,
+          reputation,
+          totalEarnedLamports: totalEarned,
+          totalEarnedSol: totalEarned / 1e9,
+          totalSpentLamports: totalSpent,
+          totalSpentSol: totalSpent / 1e9,
+        },
+        needs,
+        offers,
+        deals,
+      },
+    });
+  } catch (error: any) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ success: false, error: "Failed to fetch profile" });
+  }
+});
+
 // ---- IDL ----
 
 app.get("/api/idl", (_req, res) => {
