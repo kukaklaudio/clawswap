@@ -37,6 +37,7 @@ export default function NeedDetailPage() {
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerForm, setOfferForm] = useState({ price: "", message: "" });
   const [deliveryHash, setDeliveryHash] = useState("");
+  const [deliveryContent, setDeliveryContent] = useState("");
 
   const refresh = useCallback(async () => {
     try {
@@ -160,14 +161,14 @@ export default function NeedDetailPage() {
   };
 
   const handleSubmitDelivery = async (deal: Deal) => {
-    if (!wallet.publicKey || !deliveryHash) return;
+    if (!wallet.publicKey || !deliveryHash || !deliveryContent) return;
     setSubmitting(true);
     setActiveAction(`deliver-${deal.id}`);
     try {
       const program = getProgram();
 
       await program.methods
-        .submitDelivery(deliveryHash)
+        .submitDelivery(deliveryHash, deliveryContent)
         .accounts({
           deal: getDealPda(deal.id),
           provider: wallet.publicKey,
@@ -175,6 +176,7 @@ export default function NeedDetailPage() {
         .rpc();
 
       setDeliveryHash("");
+      setDeliveryContent("");
       await refresh();
     } catch (error: any) {
       alert(`Error: ${error.message}`);
@@ -484,14 +486,28 @@ export default function NeedDetailPage() {
                     </div>
                   </div>
 
-                  {deal.deliveryHash && (
-                    <div className="bg-[#0A0A0A] rounded-lg p-3 mb-4">
-                      <p className="text-xs text-[#505050] mb-1">
-                        📦 Delivery Hash
-                      </p>
-                      <p className="text-sm text-white font-mono break-all">
-                        {deal.deliveryHash}
-                      </p>
+                  {(deal.deliveryHash || deal.deliveryContent) && (
+                    <div className="bg-[#0A0A0A] rounded-lg p-3 mb-4 space-y-3">
+                      {deal.deliveryContent && (
+                        <div>
+                          <p className="text-xs text-[#505050] mb-1">
+                            📦 Deliverable
+                          </p>
+                          <p className="text-sm text-white break-all whitespace-pre-wrap">
+                            {deal.deliveryContent}
+                          </p>
+                        </div>
+                      )}
+                      {deal.deliveryHash && (
+                        <div>
+                          <p className="text-xs text-[#505050] mb-1">
+                            🔗 Verification Hash
+                          </p>
+                          <p className="text-sm text-white font-mono break-all">
+                            {deal.deliveryHash}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -499,27 +515,49 @@ export default function NeedDetailPage() {
                   {deal.status === "inProgress" && isProvider && (
                     <div className="bg-[#25D0AB]/10 rounded-lg p-4 border border-[#25D0AB]/20">
                       <p className="text-sm text-[#7E7E7E] mb-3">
-                        📦 Ready to deliver? Submit your work hash (IPFS, URL,
-                        or identifier):
+                        📦 Ready to deliver? Submit your deliverable and a verification hash:
                       </p>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={deliveryHash}
-                          onChange={(e) => setDeliveryHash(e.target.value)}
-                          placeholder="QmX7bF3jK9mN2pL4qR8s... or https://..."
-                          className="flex-1 bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-3 py-2 text-white text-sm focus:border-[#25D0AB] focus:outline-none"
-                        />
-                        <button
-                          onClick={() => handleSubmitDelivery(deal)}
-                          disabled={submitting || !deliveryHash}
-                          className="px-5 py-2 bg-[#25D0AB] rounded-lg text-sm font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-[#0A0A0A]"
-                        >
-                          {submitting &&
-                          activeAction === `deliver-${deal.id}`
-                            ? "Submitting..."
-                            : "Submit"}
-                        </button>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs text-[#505050] block mb-1">
+                            Deliverable (text, URL, file link, API response, etc.)
+                          </label>
+                          <textarea
+                            value={deliveryContent}
+                            onChange={(e) => setDeliveryContent(e.target.value)}
+                            rows={4}
+                            maxLength={512}
+                            placeholder="Paste your deliverable here: code output, API endpoint, file URL, report text, or any proof of work..."
+                            className="w-full bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-3 py-2 text-white text-sm focus:border-[#25D0AB] focus:outline-none resize-none"
+                          />
+                          <p className="text-xs text-[#505050] mt-1 text-right">
+                            {deliveryContent.length}/512
+                          </p>
+                        </div>
+                        <div>
+                          <label className="text-xs text-[#505050] block mb-1">
+                            Verification Hash (IPFS CID, SHA-256, or URL)
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={deliveryHash}
+                              onChange={(e) => setDeliveryHash(e.target.value)}
+                              placeholder="QmX7bF3jK9mN2pL4qR8s... or https://..."
+                              className="flex-1 bg-[#0A0A0A] border border-white/[0.06] rounded-lg px-3 py-2 text-white text-sm focus:border-[#25D0AB] focus:outline-none"
+                            />
+                            <button
+                              onClick={() => handleSubmitDelivery(deal)}
+                              disabled={submitting || !deliveryHash || !deliveryContent}
+                              className="px-5 py-2 bg-[#25D0AB] rounded-lg text-sm font-semibold hover:brightness-110 disabled:opacity-50 transition-all text-[#0A0A0A]"
+                            >
+                              {submitting &&
+                              activeAction === `deliver-${deal.id}`
+                                ? "Submitting..."
+                                : "Submit Delivery"}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}

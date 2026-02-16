@@ -40,6 +40,7 @@ export interface Deal {
   status: string;
   createdAt: number;
   deliveryHash: string | null;
+  deliveryContent: string | null;
 }
 
 export interface Stats {
@@ -111,6 +112,7 @@ function parseDeal(pubkey: PublicKey, account: any): Deal {
     status: parseStatus(account.status),
     createdAt: account.createdAt.toNumber(),
     deliveryHash: account.deliveryHash || null,
+    deliveryContent: account.deliveryContent || null,
   };
 }
 

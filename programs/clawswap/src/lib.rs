@@ -122,6 +122,7 @@ pub mod clawswap {
         deal.status = DealStatus::InProgress;
         deal.created_at = Clock::get()?.unix_timestamp;
         deal.delivery_hash = None;
+        deal.delivery_content = None;
         deal.bump = ctx.bumps.deal;
 
         global.deal_counter += 1;
@@ -141,19 +142,23 @@ pub mod clawswap {
     pub fn submit_delivery(
         ctx: Context<SubmitDelivery>,
         delivery_hash: String,
+        delivery_content: String,
     ) -> Result<()> {
         let deal = &mut ctx.accounts.deal;
         
         require!(deal.status == DealStatus::InProgress, ErrorCode::DealNotInProgress);
         require!(deal.provider == ctx.accounts.provider.key(), ErrorCode::NotProvider);
+        require!(delivery_content.len() <= 512, ErrorCode::DeliveryContentTooLong);
 
         deal.delivery_hash = Some(delivery_hash.clone());
+        deal.delivery_content = Some(delivery_content.clone());
         deal.status = DealStatus::DeliverySubmitted;
 
         emit!(DeliverySubmitted {
             deal_id: deal.id,
             provider: deal.provider,
             delivery_hash,
+            delivery_content,
         });
 
         Ok(())
@@ -376,11 +381,13 @@ pub struct Deal {
     pub status: DealStatus,
     pub created_at: i64,
     pub delivery_hash: Option<String>,
+    pub delivery_content: Option<String>,
     pub bump: u8,
 }
 
 impl Deal {
-    pub const SIZE: usize = 8 + 8 + 8 + 8 + 32 + 32 + 8 + 1 + 8 + (1 + 4 + 64) + 1;
+    // +1 (Option) +4 (String len) +512 (max content) for delivery_content
+    pub const SIZE: usize = 8 + 8 + 8 + 8 + 32 + 32 + 8 + 1 + 8 + (1 + 4 + 64) + (1 + 4 + 512) + 1;
 }
 
 // Enums
@@ -441,6 +448,7 @@ pub struct DeliverySubmitted {
     pub deal_id: u64,
     pub provider: Pubkey,
     pub delivery_hash: String,
+    pub delivery_content: String,
 }
 
 #[event]
@@ -468,4 +476,6 @@ pub enum ErrorCode {
     DeliveryNotSubmitted,
     #[msg("Not the client")]
     NotClient,
+    #[msg("Delivery content exceeds 512 characters")]
+    DeliveryContentTooLong,
 }

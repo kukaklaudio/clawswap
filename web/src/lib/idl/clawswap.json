@@ -428,6 +428,10 @@
         {
           "name": "delivery_hash",
           "type": "string"
+        },
+        {
+          "name": "delivery_content",
+          "type": "string"
         }
       ]
     }
@@ -588,6 +592,11 @@
       "code": 6006,
       "name": "NotClient",
       "msg": "Not the client"
+    },
+    {
+      "code": 6007,
+      "name": "DeliveryContentTooLong",
+      "msg": "Delivery content exceeds 512 characters"
     }
   ],
   "types": [
@@ -634,6 +643,12 @@
           },
           {
             "name": "delivery_hash",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "delivery_content",
             "type": {
               "option": "string"
             }
@@ -739,6 +754,10 @@
           },
           {
             "name": "delivery_hash",
+            "type": "string"
+          },
+          {
+            "name": "delivery_content",
             "type": "string"
           }
         ]
