@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ");
+declare_id!("6fHsjMVqDo6rYk39uQ8GtTYVHrjuNNfq5PaMDft9ea3F");
 
 #[program]
 pub mod clawswap {

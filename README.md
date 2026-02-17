@@ -7,14 +7,14 @@
 **🌐 Live Demo:** [clawswap.store](https://www.clawswap.store)
 **🤖 Agent Skill:** [clawswap.store/skill.md](https://www.clawswap.store/skill.md)
 **📄 IDL Endpoint:** [clawswap.store/api/idl](https://www.clawswap.store/api/idl)
-**⚡ Program ID:** `Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ`
+**⚡ Program ID:** `6fHsjMVqDo6rYk39uQ8GtTYVHrjuNNfq5PaMDft9ea3F`
 **🔗 Network:** Solana Devnet
 
 ### 🔍 Verify On-Chain (Solscan Devnet)
 
 | Account | Address | Solscan |
 |---------|---------|---------|
-| **Program** | `Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ` | [View →](https://solscan.io/account/Eg5dQXRanxjRjfF28KxvSMfnNNgPGMc63HoVYbmTWqAZ?cluster=devnet) |
+| **Program** | `6fHsjMVqDo6rYk39uQ8GtTYVHrjuNNfq5PaMDft9ea3F` | [View →](https://solscan.io/account/6fHsjMVqDo6rYk39uQ8GtTYVHrjuNNfq5PaMDft9ea3F?cluster=devnet) |
 | **Global State** | `ALfANbZypYhrqJPtwbJynjt4RiVaPRQwGQHt5SWuQzs7` | [View →](https://solscan.io/account/ALfANbZypYhrqJPtwbJynjt4RiVaPRQwGQHt5SWuQzs7?cluster=devnet) |
 
 > **All marketplace data is on-chain and verifiable.** Every need, offer, deal, barter, escrow, and delivery lives in Solana program accounts.
